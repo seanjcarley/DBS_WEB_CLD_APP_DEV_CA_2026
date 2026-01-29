@@ -2,11 +2,7 @@ import React, { useState } from "react";
 import { Container, TextField } from "@mui/material";
 
 const SignupPers = () => {
-    // variables to hold personal details
-    const [fname, setFname] = useState('');
-    const [surname, setSurname] = useState('');
-    const [phone, setPhone] = useState('');
-
+    
     return (
         <Container>
             <TextField

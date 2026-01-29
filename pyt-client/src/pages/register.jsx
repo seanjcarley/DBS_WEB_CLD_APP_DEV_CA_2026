@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Accordion, AccordionActions, AccordionDetails, AccordionSummary, Box, 
-    Button, Card, Container, Modal, Typography } from '@mui/material';
+    Button, Card, Container, Modal, TextField, 
+    Typography } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import UnauthNavBar from "../components/UnauthNavBar";
 import SignupCreds from "../components/SignupCreds";
 import SignupPers from "../components/SignupPers";
 import SignupVhcl from "../components/SignupVhcl";
 import axios from "axios";
+import Validator from 'validator';
 
 const Register = () => {
     // handle accordions expanding and contracting
@@ -15,18 +17,83 @@ const Register = () => {
         setExpanded(isExpanded ? panel : false);
     };
 
+    // variables to hold email, password and confirm password entries for 
+    // various validation checks
+    const [email, setEmail] = useState('');
+    const [pwrd, setPwrd] = useState('');
+    const [cnfpwd, setCnfpw] = useState('');
+    // variables to hold personal details
+    const [fname, setFname] = useState('');
+    const [surname, setSurname] = useState('');
+    const [phone, setPhone] = useState('');
+    // variables to hold vehicle details
+    const [vrn, setVrn] = useState('')
+    const [details, setDetails] = useState([]);
+    // variables for validation error alerts
+    const [emailAlert, setEmailAlert] = useState('');
+    const [emlAlrtClr, setEmlAlrtClr] = useState('')
+    const [pwrdAlert, setPwrdAlert] = useState('');
+    const [pwrdAlrtClr, setPwrdAlrtClr] = useState('')
+    const [cnfpwAlert, setCnfpwAlert] = useState('');
+    const [cnfpwAlrtClr, setCnfpwAlrtClr] = useState('');
+
+    // validate that the provided email address is in a valid email format
+    const validateEmail = (email) => {
+        if (Validator.isEmail(email)) {
+            setEmail(email);
+            setEmailAlert('Valid Email Address Format!');
+            setEmlAlrtClr('green');
+        } else {
+            setEmail('');
+            setEmailAlert('Enter a Valid Email Address!');
+            setEmlAlrtClr('red');
+        }
+    };
+
+    // validate that the provided passwordmeets minimum requirements
+    const validatePwd = (password) => {
+        if (Validator.isStrongPassword(password)) {
+            setPwrd(password);
+            setPwrdAlert('Password meets minimum requirements!');
+            setPwrdAlrtClr('green');
+        } else {
+            setPwrd('');
+            setPwrdAlert('Password does not meet minimum requirements!');
+            setPwrdAlrtClr('red');
+        }
+    };
+
+    // validate that the provided passwords match
+    const validatePwdMatch = (cnfpwd) => {
+        if (cnfpwd === pwrd) {
+            setCnfpwAlert('Passwords match!');
+            setCnfpwAlrtClr('green');
+        } else {
+            setCnfpwAlert('Passwords do not match!');
+            setCnfpwAlrtClr('red');
+        }
+    };
+
+    // handle vehicle search
+    const handleVehicleSearch = async (e) => {
+        e.preventDefault();
+        await axios.post('http://localhost:8080/api/vehicle_search', {vrn: vrn})
+        .then((res) => {
+            setDetails(res.data);
+        })
+    };
+
     // handle customer registration 
     const handleRegistration = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:8080.api/register', {
-            email: '',
-            passwword: '',
-            fname: '',
-            surname: '',
-            phone: '',
-            vrn: '',
-        })
-        console.log('Account Created!')
+        await axios.post('http://localhost:8080/api/register', {
+            email: email,
+            password: pwrd,
+            fname: fname,
+            surname: surname,
+            phone: phone,
+            vrn: vrn,
+        }) 
     };
 
     return (
@@ -55,7 +122,43 @@ const Register = () => {
                             Set your Login Credentials
                         </Typography>
                     </AccordionSummary>
-                    <AccordionDetails><SignupCreds /></AccordionDetails>
+                    <AccordionDetails>
+                        <TextField
+                            fullWidth
+                            sx={{ mt: 2 }}
+                            label='Email'
+                            type="email"
+                            required
+                            onChange={ e => validateEmail(e.target.value)}
+                        />
+                        <Typography variant="caption" sx={{ color: emlAlrtClr }}>
+                            { emailAlert }
+                        </Typography>
+            
+                        <TextField
+                            fullWidth
+                            sx={{ mt: 2 }}
+                            label='Password'
+                            type="password"
+                            required
+                            onChange={ e => validatePwd(e.target.value)}
+                        />
+                        <Typography variant="caption" sx={{ color: pwrdAlrtClr }}>
+                            { pwrdAlert }
+                        </Typography>
+            
+                        <TextField
+                            fullWidth
+                            sx={{ mt: 2 }}
+                            label='Confirm Password'
+                            type="password"
+                            required
+                            onChange={ e => validatePwdMatch(e.target.value)}
+                        />
+                        <Typography variant="caption" sx={{ color: cnfpwAlrtClr }}>
+                            { cnfpwAlert }
+                        </Typography>
+                    </AccordionDetails>
                 </Accordion>
 
                 <Accordion
@@ -74,7 +177,32 @@ const Register = () => {
                             Add your Personal Details
                         </Typography>
                     </AccordionSummary>
-                    <AccordionDetails><SignupPers /></AccordionDetails>
+                    <AccordionDetails>
+                        <TextField
+                            fullWidth
+                            required
+                            label='First Name'
+                            onChange={ e => setFname(e.target.value) }
+                            sx={{ mt: 1 }}
+                        />
+            
+                        <TextField
+                            fullWidth
+                            required
+                            label='Surname'
+                            onChange={ e => setSurname(e.target.value) }
+                            sx={{ mt: 1 }}
+                        />
+            
+                        <TextField
+                            fullWidth
+                            required
+                            label='Phone'
+                            type='tel'
+                            onChange={ e => setPhone(e.target.value) }
+                            sx={{ mt: 1 }}
+                        />
+                    </AccordionDetails>
                 </Accordion>
 
                 <Accordion
@@ -93,7 +221,33 @@ const Register = () => {
                             Add your Vehicle Details
                         </Typography>
                     </AccordionSummary>
-                    <AccordionDetails><SignupVhcl /></AccordionDetails>
+                    <AccordionDetails>
+                        <Box
+                            sx={{
+                                width: '100%',
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(2, minmax(min(200px, 50%), 1fr))',
+                                gap: 2
+                            }}
+                        >
+                            
+                            <TextField
+                                label='Vehicle Registration Number (VRN)'
+                                onChange={ e => setVrn(e.target.value) }
+                                sx={{ mt: 1}}
+                                required
+                            />
+            
+                            <Button
+                                id="vehicle-search-btn"
+                                variant="contained"
+                                color="primary"
+                                onClick={handleVehicleSearch}
+                            >
+                                Find Vehicle
+                            </Button>
+                        </Box>
+                    </AccordionDetails>
                 </Accordion>
                 <Box
                     align='center'

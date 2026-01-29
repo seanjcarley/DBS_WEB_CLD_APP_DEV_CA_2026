@@ -6,9 +6,8 @@ import axios from "axios";
 
 const SignupVhcl = () => {
     // variables to hold vehicle details
-    const [vrn, setVrn] = useState('')
     const [details, setDetails] = useState([]);
-
+    
     const handleVehicleSearch = async (e) => {
         e.preventDefault();
         await axios.post('http://localhost:8080/api/vehicle_search', {vrn: vrn})

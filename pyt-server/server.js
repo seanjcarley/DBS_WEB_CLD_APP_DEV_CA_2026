@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import mysql from 'mysql2';
+import mysql from 'mysql2/promise';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
@@ -24,95 +24,52 @@ app.post('/api/register', async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
 
     await db.query(
-        ` insert into contact_details (EMAIL
-            , PHONE
-            , PASSWORD
-        ) values (?
-            , ?
-            , ?
-        )`, [email, phone, hashed], (err, result) => {
-            if (err) {
-                console.log(err, 1);
-            } else {
-                const cid = result.insertId;
-                db.query (
-                    `insert into customers (FIRSTNAME
-                        , SURNAME
-                        , CONTACTID
-                    ) values (?
-                        , ?
-                        , ?
-                    )`, [fname, surname, cid], (err, result) =>  {
-                        if (err) {
-                            console.log(err, 2)
-                        } else {
-                            const custid = result.insertId;
-                            db.query(
-                                `select national_vehicle_file.NVFID
-                                    , national_vehicle_file.VEHICLEMAKE
-                                    , national_vehicle_file.VEHICLEMODEL
-                                    , national_vehicle_file.VEHICLECOLOUR
-                                    , national_vehicle_file.VEHICLECLASS
-                                    , national_owner_file.OWNERSEQUENCENO
-                                    , national_owner_file.OWNERSTARTDATE
-                                    , national_owner_file.OWNERENDDATE
-                                from national_vehicle_file
-                                inner join national_owner_file
-                                    on national_vehicle_file.NVFID = national_owner_file.NVFID
-                                where national_vehicle_file.VEHICLEREGNO = ?
-                                and national_owner_file.OWNERENDDATE = '9999-12-31'`,
-                                [vrn], (err, result) => {
-                                    if (err) {
-                                         console.log(err, 3)                                           
-                                    } else {
-                                        db.query(
-                                            `insert into vehicles (VEHICLEREGNO
-                                                , VEHICLEMAKE
-                                                , VEHICLEMODEL
-                                                , VEHICLECOLOUR
-                                                , VEHICLECLASS
-                                                , OWNERSEQUENCENUMBER
-                                                , VEHICLESTARTDATE
-                                                , VEHICLEENDDATE
-                                                , ACCOUNTID
-                                                , NVFID
-                                            ) values (?
-                                                , ?
-                                                , ?
-                                                , ?
-                                                , ?
-                                                , ?
-                                                , ?
-                                                , ?
-                                                , ?
-                                                , ?
-                                            )`, [vrn, 
-                                                result[0].national_vehicle_file.VEHICLEMAKE,
-                                                result[0].national_vehicle_file.VEHICLEMODEL,
-                                                result[0].national_vehicle_file.VEHICLECOLOUR,
-                                                result[0].national_vehicle_file.VEHICLECLASS,
-                                                result[0].national_owner_file.OWNERSEQUENCENO,
-                                                result[0].national_owner_file.OWNERSTARTDATE,
-                                                result[0].national_owner_file.OWNERENDDATE,
-                                                custid,
-                                                result[0].national_vehicle_file.NVFID,
-                                            ], (err, result) => {
-                                                if (err) {
-                                                    console.log(err, 4)
-                                                } else {
-                                                    console.log('Success!')
-                                                }
-                                            }
-                                        );
-                                    }
-                                }
-                            );
-                        }
-                    }
-                );
-            }
-        }
-    );
+        `insert into contact_details (EMAIL, PHONE, PASSWORD) 
+            values (?, ?, ?);`, [email, phone, hashed]);
+
+    console.log('Query 1!');
+
+    await db.query(
+        `insert into customers (FIRSTNAME, SURNAME, CONTACTID) 
+            values (?, ?, (
+                select CONTACTID from contact_details where EMAIL = ?
+            ));`, [fname, surname, email]);
+
+    console.log('Query 2!');
+
+    await db.query(
+        
+        `insert into vehicles (VEHICLEREGNO, VEHICLEMAKE, VEHICLEMODEL
+            , VEHICLECOLOUR, VEHICLECLASS, OWNERSEQUENCENUMBER
+            , VEHICLESTARTDATE, VEHICLEENDDATE, NVFID, ACCOUNTID
+        ) values (
+            select national_vehicle_file.VEHICLEREGNO
+                , national_vehicle_file.VEHICLEMAKE
+                , national_vehicle_file.VEHICLEMODEL
+                , national_vehicle_file.VEHICLECOLOUR
+                , national_vehicle_file.VEHICLECLASS
+                , national_owner_file.OWNERSEQUENCENO
+                , national_owner_file.OWNERSTARTDATE
+                , national_owner_file.OWNERENDDATE 
+                , national_vehicle_file.NVFID
+            from national_vehicle_file 
+            inner join national_owner_file 
+            on national_vehicle_file.NVFID = national_owner_file.NVFID 
+            where national_vehicle_file.VEHICLEREGNO = ? 
+            and national_owner_file.OWNERENDDATE = '9999-12-31');
+            select CUSTOMERID 
+            from customers 
+            where FIRSTNAME = ?
+            and CONTACTID = (
+                select CONTACTID 
+                from contact_details 
+                where EMAIL = ?
+            )
+        )`, [vrn, fname, email]);
+
+    console.log('Query 3!');
+
+    res.sendStatus(201);
 });
 
 // user login

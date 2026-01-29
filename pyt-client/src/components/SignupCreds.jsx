@@ -2,13 +2,7 @@ import React, { useState } from "react";
 import { Container, TextField, Typography } from "@mui/material";
 import Validator from 'validator';
 
-const SignupCreds = () => {
-    // variables to hold email, password and confirm password entries for 
-    // various validation checks
-    const [email, setEmail] = useState('');
-    const [pwrd, setPwrd] = useState('');
-    const [cnfpwd, setCnfpw] = useState('');
-
+const SignupCreds = () => {  
     // variables for validation error alerts
     const [emailAlert, setEmailAlert] = useState('');
     const [emlAlrtClr, setEmlAlrtClr] = useState('')
