@@ -23,59 +23,20 @@ app.post('/api/register', async (req, res) => {
     const { email, password, fname, surname, phone, vrn } = req.body;
     const hashed = await bcrypt.hash(password, 10);
 
-    await db.query(
-        `insert into contact_details (EMAIL, PHONE, PASSWORD) 
-            values (?, ?, ?);`, [email, phone, hashed]);
-
-    console.log('Query 1!');
-
-    await db.query(
-        `insert into customers (FIRSTNAME, SURNAME, CONTACTID) 
-            values (?, ?, (
-                select CONTACTID from contact_details where EMAIL = ?
-            ));`, [fname, surname, email]);
-
-    console.log('Query 2!');
-
-    await db.query(
-        
-        `insert into vehicles (VEHICLEREGNO, VEHICLEMAKE, VEHICLEMODEL
-            , VEHICLECOLOUR, VEHICLECLASS, OWNERSEQUENCENUMBER
-            , VEHICLESTARTDATE, VEHICLEENDDATE, NVFID, ACCOUNTID
-        ) values (
-            select national_vehicle_file.VEHICLEREGNO
-                , national_vehicle_file.VEHICLEMAKE
-                , national_vehicle_file.VEHICLEMODEL
-                , national_vehicle_file.VEHICLECOLOUR
-                , national_vehicle_file.VEHICLECLASS
-                , national_owner_file.OWNERSEQUENCENO
-                , national_owner_file.OWNERSTARTDATE
-                , national_owner_file.OWNERENDDATE 
-                , national_vehicle_file.NVFID
-            from national_vehicle_file 
-            inner join national_owner_file 
-            on national_vehicle_file.NVFID = national_owner_file.NVFID 
-            where national_vehicle_file.VEHICLEREGNO = ? 
-            and national_owner_file.OWNERENDDATE = '9999-12-31');
-            select CUSTOMERID 
-            from customers 
-            where FIRSTNAME = ?
-            and CONTACTID = (
-                select CONTACTID 
-                from contact_details 
-                where EMAIL = ?
-            )
-        )`, [vrn, fname, email]);
-
-    console.log('Query 3!');
-
-    res.sendStatus(201);
+    await db.query('call sp_AddCustomer(?, ?, ?, ?, ?, ?);', 
+        [email, hashed, fname, surname, phone, vrn], (err, result) => {
+            if (err) {
+                res.sendStatus(401);
+            } else {
+                res.sendStatus(201);
+            }
+        })
 });
 
 // user login
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    const [users] = db.query('')
+    const [users] = await db.query('select PASSWORD from contact_details where email = ?', [email]);
     
     if (users.length === 0 || !await bcrypt.compare(password, users[0].password)) {
         return res.status(401).send('Invalid credentials');
