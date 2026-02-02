@@ -5,11 +5,13 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 
+// use .env file for environment variables
 dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// create connection pool
 const db = await mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -18,78 +20,95 @@ const db = await mysql.createPool({
     connectionLimit: 10,
 });
 
-// user registration
-app.post('/api/register', async (req, res) => {
-    const { email, password, fname, surname, phone, vrn } = req.body;
-    const hashed = await bcrypt.hash(password, 10);
-
-    await db.query('call sp_AddCustomer(?, ?, ?, ?, ?, ?);', 
-        [email, hashed, fname, surname, phone, vrn], (err, result) => {
-            if (err) {
-                res.sendStatus(401);
-            } else {
-                res.sendStatus(201);
-            }
-        })
-});
-
-// user login
-app.post('/api/login', async (req, res) => {
-    const { email, password } = req.body;
-    const [users] = await db.query('select PASSWORD from contact_details where email = ?', [email]);
-    
-    if (users.length === 0 || !await bcrypt.compare(password, users[0].password)) {
-        return res.status(401).send('Invalid credentials');
-    }
-
-    const token = jwt.sign({}, process.env.JWT_SECRET, { expiresIn: '1d'});
-    res.json({ token });
-});
 
 // JWT middleware
 const authenticate = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.sendStatus(403);
+    console.log(token)
+    if (!token) return res.status(403).send('Token Missing!');
     try {
         req.user = jwt.verify(token, process.env.JWT_SECRET);
         next();
     } catch {
-        res.sendStatus(403);
+        console.error('Invalid Token: ', err);
+        res.sendStatus(403).send('Invalid Token!');
     }
 };
 
+
+// user registration
+app.post('/api/register', async (req, res) => {
+    const { email, password, fname, surname, phone, vrn, } = req.body;
+    const hashed = await bcrypt.hash(password, 10);
+
+    const cust = await db.query(
+        `call sp_AddCustomer(?, ?, ?, ?, ?, ?, @custID);`, 
+        [email, hashed, fname, surname, phone, vrn]
+    );
+    res.sendStatus(201);
+});
+
+
 //search for vehicle details
-app.post('/api/vehicle_search', (req, res) => {
+app.post('/api/vehicle_search', async (req, res) => {
     const vrn = req.body.vrn;
-    console.log(vrn);
-    db.query(
+    const veh = await db.query(
         `select VEHICLEMAKE
             , VEHICLEMODEL
             , VEHICLECOLOUR
             , VEHICLECLASS
         from national_vehicle_file
         where VEHICLEREGNO = ?`,
-        [vrn], (err, result) => {
-            if (err) {
-                console.log(err);
-                res.send(['Error!', err.name]);
-            } else if (result.length === 0) {
-                console.log(`There is no vehicle matching the VRN: ${vrn}`);
-                res.send(['Uh oh!', 'There is no vehicle matching the VRN provided!']);
-            } else {
-                console.log(`Vehicle ${vrn} found!`);
-                res.send({
-                    vrn: vrn,
-                    vmk: result[0].VEHICLEMAKE,
-                    vmd: result[0].VEHICLEMODEL,
-                    vcr: result[0].VEHICLECOLOUR,
-                    vcs: result[0].VEHICLECLASS,
-                })
-            }
-        }
+        [vrn]
     )
+    // console.log(veh[0][0]);
+    res.send(veh[0][0]);
 });
 
-app.listen(8080, () => {
-    console.log('Server listening on Port 8080!');
+
+// user login
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const [users] = await db.query(`call sp_Login(?)`, [email]);
+        //console.log(users[0][0]);
+
+        // chack that email is on the system
+        if (users.length === 0) {
+            return res.status(401).send('Invalid Credentials!');
+        }
+
+        // check if the correct password has been provided
+        const match = await bcrypt.compare(password, users[0][0].PASSWORD);
+        if (!match) return res.status(401).send('Invalid Credentials!');
+
+        // 
+        const token = jwt.sign({ id: users[0][0].CUSTOMERID}, process.env.JWT_SECRET, {
+            expiresIn: '1d'
+        });
+
+        //
+        const custID = users[0][0].CUSTOMERID;
+
+        res.json({ token, custID });
+    } catch (err) {
+        console.error('Login error: ', err);
+        res.status(500).send('Internal Server Error!');
+    }
+});
+
+
+// account summary
+app.post('/api/account_summary/:id', authenticate, async (req, res) => {
+    const num = parseInt(req.params.id.split(':')[1]);
+    const [summary] = await db.query(`call sp_AccountSummary(?)`, [num]);
+    console.log(summary[0]);
+    console.log(summary[1]);
+    res.json(summary);
+});
+
+
+// start server on port
+app.listen(5000, () => {
+    console.log('Server listening on Port 5000!');
 });

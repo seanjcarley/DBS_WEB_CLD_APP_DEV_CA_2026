@@ -1,10 +1,25 @@
 import React, { useState } from "react";
 import { Button, Container, TextField, Typography } from "@mui/material";
 import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 
 const SigninForm = () => {
     const [email, setEmail] = useState('');
     const [pwrd, setPwrd] = useState('');
+    const navigate = useNavigate();
+
+    const handleSignin = async (e) => {
+        e.preventDefault();
+        const res = await axios.post('http://localhost:5000/api/login', {
+            email: email,
+            password: pwrd,
+        });
+        
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('ID', res.data.custID);
+
+        navigate(`/account_summary`);
+    };
 
     return (
         <Container
@@ -38,7 +53,7 @@ const SigninForm = () => {
                 variant="contained"
                 color="secondary"
                 sx={{ mt: 2 }}
-                
+                onClick={ handleSignin }
             >
                 Login
             </Button>

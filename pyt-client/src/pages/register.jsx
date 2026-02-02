@@ -1,14 +1,12 @@
-import React, { useState } from "react";
-import { Accordion, AccordionActions, AccordionDetails, AccordionSummary, Box, 
-    Button, Card, Container, Modal, TextField, 
-    Typography } from '@mui/material';
+import React, { useEffect, useState } from "react";
+import { Accordion, AccordionActions, AccordionDetails, AccordionSummary, Alert, 
+    Box, Button, Card, Container, List, ListItem, Modal, TextField, Typography } 
+from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import UnauthNavBar from "../components/UnauthNavBar";
-import SignupCreds from "../components/SignupCreds";
-import SignupPers from "../components/SignupPers";
-import SignupVhcl from "../components/SignupVhcl";
 import axios from "axios";
 import Validator from 'validator';
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
     // handle accordions expanding and contracting
@@ -16,6 +14,9 @@ const Register = () => {
     const handleAccordionChange = (panel) => (e, isExpanded) => {
         setExpanded(isExpanded ? panel : false);
     };
+
+    const navigate = useNavigate();
+    const [error, setError] = useState('');
 
     // variables to hold email, password and confirm password entries for 
     // various validation checks
@@ -36,6 +37,19 @@ const Register = () => {
     const [pwrdAlrtClr, setPwrdAlrtClr] = useState('')
     const [cnfpwAlert, setCnfpwAlert] = useState('');
     const [cnfpwAlrtClr, setCnfpwAlrtClr] = useState('');
+    // variables for modal
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '50%',
+        bgcolor: 'background.paper',
+    };
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
 
     // validate that the provided email address is in a valid email format
     const validateEmail = (email) => {
@@ -68,6 +82,7 @@ const Register = () => {
         if (cnfpwd === pwrd) {
             setCnfpwAlert('Passwords match!');
             setCnfpwAlrtClr('green');
+            setCnfpw('match')
         } else {
             setCnfpwAlert('Passwords do not match!');
             setCnfpwAlrtClr('red');
@@ -77,23 +92,32 @@ const Register = () => {
     // handle vehicle search
     const handleVehicleSearch = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:8080/api/vehicle_search', {vrn: vrn})
-        .then((res) => {
-            setDetails(res.data);
-        })
+        const res = await axios.post('http://localhost:5000/api/vehicle_search'
+            , {vrn: vrn});
+        
+        setDetails(res.data);
+        setOpen(true);
+
     };
 
     // handle customer registration 
     const handleRegistration = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:8080/api/register', {
+        
+        if (!email || !pwrd || !cnfpwd || !fname || !surname || ! phone || !vrn) {
+            setError('Please fill in all required fields!');
+            return;
+        }
+        
+        await axios.post('http://localhost:5000/api/register', {
             email: email,
             password: pwrd,
             fname: fname,
             surname: surname,
             phone: phone,
             vrn: vrn,
-        }) 
+        })
+        navigate('/account_summary');
     };
 
     return (
@@ -106,6 +130,11 @@ const Register = () => {
                 <Typography variant="h4" align="center" sx={{ mt: 2 }}>
                     Sign Up with us to Save on your Tolls!
                 </Typography>
+                
+                {error && (
+                    <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>
+                )}
+
                 <Accordion
                     defaultExpanded='true'
                     expanded={expanded === 'panel1'}
@@ -252,6 +281,7 @@ const Register = () => {
                 <Box
                     align='center'
                     sx={{ width: '100%' }}
+                    
                 >
                     <Button
                         variant="contained"
@@ -262,6 +292,66 @@ const Register = () => {
                         Register
                     </Button>
                 </Box>
+            </Container>
+            <Container>
+                <Modal
+                    open={open}
+                    onClose={ handleClose }
+                    aria-labelledby='modal-title'
+                    aria-describedby='modal-description'
+                >
+                    <Box sx={ style }>
+                        <Typography
+                            id='modal-title'
+                            variant="h5"
+                            component='h2'
+                            sx={{ m: 5}}
+                        >
+                            Vehicle Details
+
+                        </Typography>
+                        <Typography
+                            id='modal-description'
+                            variant="body1"
+                            sx={{ m: 5}}
+                        >
+                            Please check that the details below match your 
+                            vehicle { vrn }: 
+                        </Typography>
+                        <List>
+                            <ListItem>
+                                Vehicle Make: { details.VEHICLEMAKE}
+                            </ListItem>
+                            <ListItem>
+                                Vehicle Model: { details.VEHICLEMODEL }
+                            </ListItem>
+                            <ListItem>
+                                Vehicle Colour: { details.VEHICLECOLOUR }
+                            </ListItem>
+                            <ListItem>
+                                Vehicle Class: { details.VEHICLECLASS }
+                            </ListItem>
+                        </List>
+                        <Box align='center'>
+                            <Button 
+                                variant="contained" 
+                                color="success"
+                                onClick={ handleClose }
+                                sx={{ m: 2}}
+                            >
+                                Details Are Correct
+                            </Button>
+                            <Button 
+                                variant="outlined" 
+                                color="error"
+                                onClick={ handleClose }
+                                sx={{ m: 2}}
+                            >
+                                Re-enter Details
+                            </Button>
+                        </Box>
+                    </Box>
+                </Modal>
             </Container>
         </>
     );
