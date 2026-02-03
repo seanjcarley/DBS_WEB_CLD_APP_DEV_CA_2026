@@ -3,6 +3,10 @@ import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 
 const AuthNavBar = ({onMenuClick}) => {
+    const logout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('ID');
+    }
     return (
         <AppBar position="static">
             <Toolbar>
@@ -11,16 +15,16 @@ const AuthNavBar = ({onMenuClick}) => {
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Button color="inherit" component={Link} to="/account_summary">
-                        Account Summary
+                        Vehicles
                     </Button>
                     <Button color="inherit" component={Link} to="/account_summary">
-                        Vehicles
+                        Payment
                     </Button>
                     <Button color="inherit" component={Link} to="/account_summary">
                         Journeys
                     </Button>
-                    <Button color="inherit" component={Link} to="/account_summary">
-                        Payments
+                    <Button color="inherit" component={Link} to="/" onClick={logout()}>
+                        Log Out
                     </Button>
                 </Box>
             </Toolbar>

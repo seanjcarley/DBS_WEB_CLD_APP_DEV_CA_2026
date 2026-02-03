@@ -24,7 +24,7 @@ const db = await mysql.createPool({
 // JWT middleware
 const authenticate = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
-    console.log(token)
+    // console.log(token)
     if (!token) return res.status(403).send('Token Missing!');
     try {
         req.user = jwt.verify(token, process.env.JWT_SECRET);
@@ -99,12 +99,20 @@ app.post('/api/login', async (req, res) => {
 
 
 // account summary
-app.post('/api/account_summary/:id', authenticate, async (req, res) => {
+app.post('/api/account_summary_1/:id', authenticate, async (req, res) => {
     const num = parseInt(req.params.id.split(':')[1]);
-    const [summary] = await db.query(`call sp_AccountSummary(?)`, [num]);
-    console.log(summary[0]);
-    console.log(summary[1]);
-    res.json(summary);
+    const [results] = await db.query(`call sp_AccountSummary_1(?)`, [num]);
+    console.log(results);
+
+    res.json(results[0]);
+});
+
+app.post('/api/account_summary_2/:id', authenticate, async (req, res) => {
+    const num = parseInt(req.params.id.split(':')[1]);
+    const [results] = await db.query(`call sp_AccountSummary_2(?)`, [num]);
+    console.log(results);
+
+    res.json(results[0]);
 });
 
 

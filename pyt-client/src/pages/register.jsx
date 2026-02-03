@@ -117,7 +117,7 @@ const Register = () => {
             phone: phone,
             vrn: vrn,
         })
-        navigate('/account_summary');
+        navigate('/signin');
     };
 
     return (
