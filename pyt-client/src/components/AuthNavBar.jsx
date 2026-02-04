@@ -14,7 +14,7 @@ const AuthNavBar = ({onMenuClick}) => {
                     Pay Your Toll!
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Button color="inherit" component={Link} to="/account_summary">
+                    <Button color="inherit" component={Link} to="/vehicles">
                         Vehicles
                     </Button>
                     <Button color="inherit" component={Link} to="/account_summary">
@@ -23,7 +23,12 @@ const AuthNavBar = ({onMenuClick}) => {
                     <Button color="inherit" component={Link} to="/account_summary">
                         Journeys
                     </Button>
-                    <Button color="inherit" component={Link} to="/" onClick={logout()}>
+                    <Button 
+                        color="inherit" 
+                        component={Link} 
+                        to="/" 
+                        onClick={logout}
+                    >
                         Log Out
                     </Button>
                 </Box>

@@ -32,7 +32,7 @@ const Register = () => {
     const [details, setDetails] = useState([]);
     // variables for validation error alerts
     const [emailAlert, setEmailAlert] = useState('');
-    const [emlAlrtClr, setEmlAlrtClr] = useState('')
+    const [emlAlrtClr, setEmlAlrtClr] = useState('');
     const [pwrdAlert, setPwrdAlert] = useState('');
     const [pwrdAlrtClr, setPwrdAlrtClr] = useState('')
     const [cnfpwAlert, setCnfpwAlert] = useState('');

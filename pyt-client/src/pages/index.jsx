@@ -13,7 +13,10 @@ const Index = () => {
                 maxWidth='md'
                 sx={{ mt: 10}}
             >
-                <Typography variant='h2' align='center'>
+                <Typography 
+                    variant='h2' 
+                    align='center'
+                >
                     Welcome to Pay your Toll!
                 </Typography>
                 <Card sx={{ mb: 3 }}>
@@ -83,7 +86,7 @@ const Index = () => {
                                 fullWidth
                                 variant='outlined'
                                 color='secondary'
-                                sx={{ mt: 2 }}
+                                sx={{ mt: 4.5 }}
                                 component={Link} 
                                 to="/signin"
                             >

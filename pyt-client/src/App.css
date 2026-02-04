@@ -5,6 +5,19 @@
   text-align: center;
 }
 
+:root {
+    --eflow_navy: #00376c;
+    --eflow_purple: #85267a;
+    --sky: #b7e7ff;
+    --road: #437189;
+}
+
+body {
+  background-color: var(--sky);
+  /* margin: 0; added */
+  /* width: 100%; added */
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

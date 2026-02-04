@@ -30,8 +30,7 @@ const authenticate = (req, res, next) => {
         req.user = jwt.verify(token, process.env.JWT_SECRET);
         next();
     } catch {
-        console.error('Invalid Token: ', err);
-        res.sendStatus(403).send('Invalid Token!');
+        res.sendStatus(403);
     }
 };
 
@@ -102,7 +101,7 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/account_summary_1/:id', authenticate, async (req, res) => {
     const num = parseInt(req.params.id.split(':')[1]);
     const [results] = await db.query(`call sp_AccountSummary_1(?)`, [num]);
-    console.log(results);
+    // console.log(results);
 
     res.json(results[0]);
 });
@@ -110,10 +109,29 @@ app.post('/api/account_summary_1/:id', authenticate, async (req, res) => {
 app.post('/api/account_summary_2/:id', authenticate, async (req, res) => {
     const num = parseInt(req.params.id.split(':')[1]);
     const [results] = await db.query(`call sp_AccountSummary_2(?)`, [num]);
-    console.log(results);
+    // console.log(results);
 
     res.json(results[0]);
 });
+
+app.post('/api/account_summary_3/:id', authenticate, async (req, res) => {
+    const num = parseInt(req.params.id.split(':')[1]);
+    const [results] = await db.query(`call sp_AccountSummary_3(?)`, [num]);
+
+    console.log(results[0]);
+    res.json(results[0]);
+})
+
+// update user details
+app.post('/api/update_user_details/:id', authenticate, async (req, res) => {
+    const { email, fname, surname, phone } = req.body;
+    const num = parseInt(req.params.id.split(':')[1]);
+    const [results] = await db.query(`
+        call sp_UpdateCustomerDetails(?, ?, ?, ?, ?)`, 
+        [fname, surname, email, phone, num]);
+
+    res.json(results[0]);
+})
 
 
 // start server on port

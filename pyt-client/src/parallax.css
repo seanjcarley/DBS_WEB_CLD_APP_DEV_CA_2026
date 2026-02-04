@@ -1,0 +1,147 @@
+/* ************************************************************************* */
+/* classes */
+/* ************************************************************************* */
+.about {
+     color: var(--sky);
+    text-align: center;
+}
+
+.bot-sect {
+    background: var(--road);
+    height: fit-content;
+    width: 100%;
+}
+
+.btn-pay {
+    background-color: var(--eflow_purple);
+    color: #fff;
+    min-height:7.5vh;
+    margin: 2rem;
+    width: 25vh;
+}
+
+.btn-pay:hover {
+    background-color: var(--eflow_navy);
+    color: var(--sky);
+}
+
+.btn-signup {
+    background-color: var(--eflow_navy);
+    color: var(--sky);
+    min-height:7.5vh;
+    width: 25vh;
+}
+
+.btn-signup:hover {
+    background-color: var(--eflow_purple);
+    color: var(----eflow_navy);
+    min-height:7.5vh;
+    width: 25vh;
+}
+
+.heading,
+.signin,
+.signup {
+    align-items: center;
+    color: var(--eflow_navy);
+    display: flex;
+    flex-direction: column;
+    text-transform: uppercase;
+}
+
+.parallax-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 95vh;
+    justify-content: center;
+    min-width: inherit;
+    perspective: 1px;
+    position: relative;
+    transform-style: preserve-3d;
+}
+
+.parallax-container::after {
+    background: url("../media/background-3.png");
+    background-position-x: center;
+    background-size: cover;
+    content: "";
+    height: 100vh;
+    position: absolute;
+    width: 100vw;
+    z-index: -1;
+}
+
+.parallax-container::before {
+    background: url('../media/background-2.png');
+    background-size: cover;
+    content: "";
+    filter:blur(2px);
+    height:100vh;
+    position: absolute;
+    transform: translateZ(-1px) scale(3.2);
+    width: 100vw;
+}
+
+.parallax-container-2 {
+    background: var(--road);
+    min-height: 75vh;
+    position: relative;
+    transform-style: preserve-3d;
+    width: 100%;
+}
+
+.pay-info, 
+.penalty-info {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    text-transform: lowercase;
+}
+
+.pay-info p,
+.penalty-info p {
+    font-weight: 400;
+    font-size: x-small;
+    margin: 0;
+    max-width: 75vw;
+    text-align: center;
+}
+
+.top-sect {
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+/* ************************************************************************* */
+/* ids */
+/* ************************************************************************* */
+
+
+
+/* ************************************************************************* */
+/* tags */
+/* ************************************************************************* */
+
+
+/* ************************************************************************* */
+/* variables */
+/* ************************************************************************* */
+:root {
+    --eflow_navy: #00376c;
+    --eflow_purple: #85267a;
+    --sky: #b7e7ff;
+    --road: #437189;
+}
+
+/* ************************************************************************* */
+/* @media queries */
+/* ************************************************************************* */
+/* The below media query applies styles for devices with a width */
+/* above 991px such as a laptop or desktop monitor */
+@media (min-width: 992px) {}
+
+/* ************************************************************************* */
+/* END */
+/* ************************************************************************* */
