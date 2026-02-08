@@ -1,25 +1,30 @@
 import React, { useState } from "react";
-import { Button, Container, TextField, Typography } from "@mui/material";
+import { Button, Container, Stack, TextField, Typography } from "@mui/material";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import { useAuth } from "../auth/authContext";
 
-const SigninForm = () => {
+export default function LoginPage() {
+    const { login } = useAuth();
+    const nav = useNavigate();
+
     const [email, setEmail] = useState('');
-    const [pwrd, setPwrd] = useState('');
-    const navigate = useNavigate();
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState('');
+    const [error, setError] = useState('');
 
-    const handleSignin = async (e) => {
+    async function onSubmit(e) {
         e.preventDefault();
-        const res = await axios.post('http://localhost:5000/api/login', {
-            email: email,
-            password: pwrd,
-        });
-        
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('ID', res.data.custID);
-
-        navigate(`/account_summary`);
-    };
+        setError('');
+        setLoading(true);
+        try {
+            await login(email, password);
+            nav(`/account_summary`);
+        } catch {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <Container
@@ -27,10 +32,18 @@ const SigninForm = () => {
             sx={{ mt: 10}}
             align='center'
         >
+            <Paper>
             <Typography variant="h4" align="center" sx={{ mt: 2 }}>
                 Login
             </Typography>
-            
+            <Stack 
+                component='form' 
+                spacing={2} 
+                onSubmit={onSubmit} 
+                sx={{ 
+                    mt : 2
+                }}
+            >
             <TextField
                 fullWidth
                 required
@@ -53,12 +66,14 @@ const SigninForm = () => {
                 variant="contained"
                 color="secondary"
                 sx={{ mt: 2 }}
-                onClick={ handleSignin }
+                type='submit'
+                disabled={loading}
             >
-                Login
+                {loading ? 'Logging in...' : 'Login'}
             </Button>
+            </Stack>
+            </Paper>
         </Container>
     );
-};
+}
 
-export default SigninForm;

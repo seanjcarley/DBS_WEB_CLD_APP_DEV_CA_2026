@@ -1,27 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Accordion, AccordionActions, AccordionDetails, AccordionSummary, Alert, 
-    Box, Button, Card, Container, List, ListItem, Modal, TextField, Typography } 
-from '@mui/material';
+import { Accordion, AccordionActions, AccordionDetails, AccordionSummary, 
+    Alert, Box, Button, Card, Container, List, ListItem, Modal, Paper, 
+    TextField, Typography } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import UnauthNavBar from "../components/UnauthNavBar";
 import axios from "axios";
 import Validator from 'validator';
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../api/client";
+import { useAuth } from "../auth/authContext";
 
-const Register = () => {
-    // handle accordions expanding and contracting
-    const [expanded, setExpanded] = useState('panel1');
-    const handleAccordionChange = (panel) => (e, isExpanded) => {
-        setExpanded(isExpanded ? panel : false);
-    };
-
-    const navigate = useNavigate();
+export default function Register() {
+    const nav = useNavigate();
+    const { login } = useAuth();
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState('');
 
     // variables to hold email, password and confirm password entries for 
     // various validation checks
     const [email, setEmail] = useState('');
-    const [pwrd, setPwrd] = useState('');
+    const [password, setPassword] = useState('');
     const [cnfpwd, setCnfpw] = useState('');
     // variables to hold personal details
     const [fname, setFname] = useState('');
@@ -29,7 +27,6 @@ const Register = () => {
     const [phone, setPhone] = useState('');
     // variables to hold vehicle details
     const [vrn, setVrn] = useState('')
-    const [details, setDetails] = useState([]);
     // variables for validation error alerts
     const [emailAlert, setEmailAlert] = useState('');
     const [emlAlrtClr, setEmlAlrtClr] = useState('');
@@ -49,8 +46,11 @@ const Register = () => {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-
-
+    // handle accordions expanding and contracting
+    const [expanded, setExpanded] = useState('panel1');
+    const handleAccordionChange = (panel) => (e, isExpanded) => {
+        setExpanded(isExpanded ? panel : false);
+    };
     // validate that the provided email address is in a valid email format
     const validateEmail = (email) => {
         if (Validator.isEmail(email)) {
@@ -63,7 +63,6 @@ const Register = () => {
             setEmlAlrtClr('red');
         }
     };
-
     // validate that the provided passwordmeets minimum requirements
     const validatePwd = (password) => {
         if (Validator.isStrongPassword(password)) {
@@ -76,7 +75,6 @@ const Register = () => {
             setPwrdAlrtClr('red');
         }
     };
-
     // validate that the provided passwords match
     const validatePwdMatch = (cnfpwd) => {
         if (cnfpwd === pwrd) {
@@ -88,6 +86,47 @@ const Register = () => {
             setCnfpwAlrtClr('red');
         }
     };
+
+    async function onSubmit(e) {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+            const payload = {
+                email: email.trim(),
+                password,
+                fname: fname.trim(),
+                surname: surname.trim(),
+                phone: phone.trim(),
+                vrn: vrn.trim(),
+            }
+            
+            // used for debug (to be commented/removed)
+            console.log(payload);
+
+            // register user
+            await apiFetch('/api/auth/register', {
+                method: 'POST',
+                auth: false,
+                body: payload,
+            });
+
+            // auto-login 
+            await login(payload.email, password);
+
+            nav('/account_summary');
+        } catch (err) {
+            setError(err.message || 'Registration Failed...');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+}
+
+const Register = () => {
+    
 
     // handle vehicle search
     const handleVehicleSearch = async (e) => {
@@ -146,7 +185,7 @@ const Register = () => {
                         expandIcon={<ArrowDropDownIcon />}
                         aria-controls="panel1-content"
                         id="panel1-header"
-                    >
+                        >
                         <Typography component='span'>
                             Set your Login Credentials
                         </Typography>
@@ -159,7 +198,7 @@ const Register = () => {
                             type="email"
                             required
                             onChange={ e => validateEmail(e.target.value)}
-                        />
+                            />
                         <Typography variant="caption" sx={{ color: emlAlrtClr }}>
                             { emailAlert }
                         </Typography>
@@ -171,7 +210,7 @@ const Register = () => {
                             type="password"
                             required
                             onChange={ e => validatePwd(e.target.value)}
-                        />
+                            />
                         <Typography variant="caption" sx={{ color: pwrdAlrtClr }}>
                             { pwrdAlert }
                         </Typography>
@@ -196,12 +235,12 @@ const Register = () => {
                     onChange={handleAccordionChange('panel2')}
                     sx={{ mt: 2 }}
                     id='acc-pers'
-                >
+                    >
                     <AccordionSummary
                         expandIcon={<ArrowDropDownIcon />}
                         aria-controls="panel2-content"
                         id="panel2-header"
-                    >
+                        >
                         <Typography component='span'>
                             Add your Personal Details
                         </Typography>
@@ -213,7 +252,7 @@ const Register = () => {
                             label='First Name'
                             onChange={ e => setFname(e.target.value) }
                             sx={{ mt: 1 }}
-                        />
+                            />
             
                         <TextField
                             fullWidth
@@ -221,7 +260,7 @@ const Register = () => {
                             label='Surname'
                             onChange={ e => setSurname(e.target.value) }
                             sx={{ mt: 1 }}
-                        />
+                            />
             
                         <TextField
                             fullWidth
@@ -230,7 +269,7 @@ const Register = () => {
                             type='tel'
                             onChange={ e => setPhone(e.target.value) }
                             sx={{ mt: 1 }}
-                        />
+                            />
                     </AccordionDetails>
                 </Accordion>
 
@@ -240,12 +279,12 @@ const Register = () => {
                     onChange={handleAccordionChange('panel3')}
                     sx={{ mt: 2 }}
                     id='acc-veh'
-                >
+                    >
                     <AccordionSummary
                         expandIcon={<ArrowDropDownIcon />}
                         aria-controls="panel3-content"
                         id="panel3-header"
-                    >
+                        >
                         <Typography component='span'>
                             Add your Vehicle Details
                         </Typography>
@@ -258,21 +297,21 @@ const Register = () => {
                                 gridTemplateColumns: 'repeat(2, minmax(min(200px, 50%), 1fr))',
                                 gap: 2
                             }}
-                        >
+                            >
                             
                             <TextField
                                 label='Vehicle Registration Number (VRN)'
                                 onChange={ e => setVrn(e.target.value) }
                                 sx={{ mt: 1}}
                                 required
-                            />
+                                />
             
                             <Button
                                 id="vehicle-search-btn"
                                 variant="contained"
                                 color="primary"
                                 onClick={handleVehicleSearch}
-                            >
+                                >
                                 Find Vehicle
                             </Button>
                         </Box>
@@ -282,17 +321,18 @@ const Register = () => {
                     align='center'
                     sx={{ width: '100%' }}
                     
-                >
+                    >
                     <Button
                         variant="contained"
                         color="secondary"
                         sx={{ mt: 2 }}
                         onClick={handleRegistration}
-                    >
+                        >
                         Register
                     </Button>
                 </Box>
             </Container>
+            
             <Container>
                 <Modal
                     open={open}
@@ -357,4 +397,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+// export default Register;

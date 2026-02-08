@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 
 const AuthNavBar = ({onMenuClick}) => {
+    const [page, setPage] = useState('');
+
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('ID');
     }
+
     return (
         <AppBar position="static">
             <Toolbar>
@@ -14,13 +17,32 @@ const AuthNavBar = ({onMenuClick}) => {
                     Pay Your Toll!
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Button color="inherit" component={Link} to="/vehicles">
+                    <Button 
+                        color="inherit" 
+                        component={Link} 
+                        to="/account_summary"
+                    >
+                        Back to Account Summary
+                    </Button>
+                    <Button 
+                        color="inherit" 
+                        component={Link} 
+                        to="/vehicles"
+                    >
                         Vehicles
                     </Button>
-                    <Button color="inherit" component={Link} to="/account_summary">
+                    <Button 
+                        color="inherit" 
+                        component={Link} 
+                        to="/account_summary"
+                    >
                         Payment
                     </Button>
-                    <Button color="inherit" component={Link} to="/account_summary">
+                    <Button 
+                        color="inherit" 
+                        component={Link} 
+                        to="/journeys"
+                    >
                         Journeys
                     </Button>
                     <Button 

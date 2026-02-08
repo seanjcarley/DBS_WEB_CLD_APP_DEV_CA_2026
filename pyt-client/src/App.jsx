@@ -1,14 +1,16 @@
 import React from 'react';
 import { Navigate, Routes, Route } from 'react-router-dom';
+import { AuthProvider, useAuth } from './auth/authContext';
 import Index from './pages/index';
-import Register from './pages/register';
-import Signin from './pages/signin';
+import Register from './pages/Register';
+import LoginPage from './pages/LoginPage';
 import AccountSummary from './pages/accountSummary';
 import Vehicles from './pages/vehicles';
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import Journeys from './pages/journeys';
+import { ThemeProvider, createTheme} from "@mui/material/styles";
 import './App.css';
 import './parallax.css';
-import { OutlinedInput } from '@mui/material';
+
 
 const theme = createTheme({
   palette: {
@@ -44,18 +46,34 @@ const theme = createTheme({
       }
     },
   }
-})
+});
+
+function RequireAuth({ children }) {
+  const { isAuthed } = useAuth();
+  if (!isAuthed) return <Navigate to='/login' replace />;
+  return children;
+}
 
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Routes>
-        <Route path='/' element={ <Index /> } />
-        <Route path='/register' element={ <Register /> } />
-        <Route path='/signin' element={ <Signin /> } />
-        <Route path='/account_summary' element={ <AccountSummary /> } />
-        <Route path='/vehicles' element={ <Vehicles /> } />
-      </Routes>
+      <AuthProvider>  
+        <Routes>
+          <Route path='/' element={ <Index /> } />
+          <Route path='/register' element={ <Register /> } />
+          <Route path='/signin' element={ <LoginPage /> } />
+          <Route 
+            path='/account_summary' 
+            element={ 
+              <RequireAuth>
+                <AccountSummary /> 
+              </RequireAuth>
+            } 
+            />
+          <Route path='/vehicles' element={ <Vehicles /> } />
+          <Route path='/journeys' element={ <Journeys /> } />
+        </Routes>
+      </AuthProvider>
     </ThemeProvider>
   )
 };

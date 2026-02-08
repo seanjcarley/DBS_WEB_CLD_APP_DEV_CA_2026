@@ -4,6 +4,7 @@ import { Box, Button, Card, CircularProgress, Container, IconButton, List,
 import AuthNavBar from "../components/AuthNavBar";
 import Validator from 'validator';
 import axios from "axios";
+import { Link } from 'react-router-dom'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -347,6 +348,8 @@ const AccountSummary = () => {
                         <Button
                             variant="contained"
                             color="primary"
+                            component={Link}
+                            to='/vehicles'
                         >
                             Manage Vehicles
                         </Button>
@@ -399,6 +402,8 @@ const AccountSummary = () => {
                         <Button
                             variant="contained"
                             color="secondary"
+                            component={Link}
+                            to='/journeys'
                         >
                             View Journeys
                         </Button>
