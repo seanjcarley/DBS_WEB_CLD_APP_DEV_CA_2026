@@ -3,7 +3,6 @@ import { Box, Button, Card, CircularProgress, Container, IconButton, List,
     ListItem, Typography, TextField } from "@mui/material";
 import AuthNavBar from "../components/AuthNavBar";
 import Validator from 'validator';
-import axios from "axios";
 import { Link } from 'react-router-dom'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -12,6 +11,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { apiFetch } from "../api/client";
 
 
 
@@ -40,42 +40,38 @@ const AccountSummary = () => {
     const [loading, setLoading] = useState(true);
     // set the token and custID variables
     const token = localStorage.getItem('token');
-    const custID = localStorage.getItem('ID');
+    const custID = localStorage.getItem('id');
+
+    const [error, setError] = useState('')
     
     // get the users details
-    useEffect( () => {
-        axios.post(
-            `http://localhost:5000/api/account_summary_1/:${custID}`, {},
-            {headers: { Authorization: `Bearer ${token}`}} 
-        ).then((res) => {
-            setCustDetails(res.data);
-
-            fetchVehicleDetails();
-        })
+    useEffect(() => {
+        async function fetchAccountData(e) {
+            // e.preventDefault();
+            setError('');
+            setLoading(true);
+            
+            try {
+                const payload = {
+                    id: custID,
+                }
+                const data = await apiFetch('/api/auth/account_summary', {
+                    method: 'POST',
+                    auth: true,
+                    body: payload,
+                });
+                setCustDetails(data.results[0]);
+                setCustVehDetails(data.results[1]);
+                setCustJrnDetails(data.results[2]);
+            } catch {
+                setError(error.message || 'Failed to retrieve account details...')
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchAccountData();
     }, []);
-
-    const fetchVehicleDetails = () => {
-        axios.post(
-            `http://localhost:5000/api/account_summary_2/:${custID}`, {},
-            {headers: {Authorization: `Bearer ${token}`}}
-        ).then((res) => {
-            setCustVehDetails(res.data);
-            fetchJourneyDetails();
-        })
-    };
-    
-    const fetchJourneyDetails = async () => {
-        axios.post(
-            `http://localhost:5000/api/account_summary_3/:${custID}`, {},
-            {headers: {Authorization: `Bearer ${token}`}}
-        ).then((res) => {
-            setCustJrnDetails(res.data)
-        }).then(() => {
-            setLoading(false);
-        })
-    };
-    // const fetchPaymentDetails = async () => {};
-
+        
     const editDetails = () => {
         setDetailsBtnDisplay('none');
         setSaveBtnDisplay('inline-flex');

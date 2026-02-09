@@ -1,8 +1,9 @@
-const router = required('express').Router();
+const router = require('express').Router();
 const { z } = require('zod');
 const { validate } = require('../middleware/validate');
-
-const { signup, login } = require('../controllers/auth.controller');
+const { signup, login, 
+    account_summary } = require('../controllers/auth.controller');
+const { makePayment } = require('../models/stripe.models');
 
 const registerSchema = z.object({
     email: z.string().email(),
@@ -18,8 +19,14 @@ const loginSchema = z.object({
     password: z.string().min(8),
 })
 
+const summarySchema = z.object({
+    id: z.string(),
+});
 
-router.post('/signup', validate(registerSchema), signup);
+
+router.post('/register', validate(registerSchema), signup);
 router.post('/login', validate(loginSchema), login);
+router.post('/account_summary', validate(summarySchema), account_summary );
+router.post('/create-checkout-session', makePayment);
 
 module.exports = router;

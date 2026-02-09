@@ -49,6 +49,8 @@ const Index = () => {
                                 variant='contained'
                                 color='secondary'
                                 sx={{ mt: 2, mb: 2 }}
+                                component={Link}
+                                to='/create-checkout-session'
                             >
                                 <Typography variant='button'>
                                     Make a Payment

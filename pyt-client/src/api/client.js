@@ -4,12 +4,14 @@ export function getToken() {
     localStorage.getItem('token');
 }
 
-export function setToken(token) {
+export function setToken(token, id) {
     localStorage.setItem('token', token);
+    localStorage.setItem('id', id);
 }
 
 export function clearToken() {
     localStorage.removeItem('token');
+    localStorage.removeItem('id');
 }
 
 export async function apiFetch(path, {method = 'GET', body, auth = true} = {}) {

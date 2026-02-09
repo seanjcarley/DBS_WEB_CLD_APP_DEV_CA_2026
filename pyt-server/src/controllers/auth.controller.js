@@ -2,11 +2,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { env } = require('../config/env');
 const { asyncHandler } = require('../utils/asyncHandler');
-const { createUser, findUserByEmail } = require('../models/users.model');
+const { createUser, findUserByEmail, 
+    fetchCustomerDetails } = require('../models/users.model');
+const { makePayment } = require('../models/stripe.models');
 
 const signup = asyncHandler(async (req, res) => {
     const {email, password, fname, surname, phone, vrn} = req.body;
-
+    const passwordHash = await bcrypt.hash(password, 10);
     const existing = await findUserByEmail(email);
     if (existing) {
         const err = new Error('Unable to Create Account. Please Call <PHONENUMBER>...');
@@ -14,11 +16,9 @@ const signup = asyncHandler(async (req, res) => {
         throw err;
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-
     const userId = await createUser({
         email, 
-        passwordHash, 
+        password, 
         fname, 
         surname, 
         phone, 
@@ -31,6 +31,7 @@ const signup = asyncHandler(async (req, res) => {
 const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     const user = await findUserByEmail(email);
+    console.log(user);
 
     if (!user) {
         const err = new Error('Invalid Email or Password...')
@@ -44,7 +45,19 @@ const login = asyncHandler(async (req, res) => {
         { expiresIn: env.JWT_EXPIRES_IN }
     );
 
-    res.json({ ok: true, token });
+    res.json({ ok: true, token, id: user.CUSTOMERID });
 })
 
-module.exports = { signup, login };
+const account_summary = asyncHandler(async (req, res) => {
+    const id = Number(req.body.id);
+    const results = await fetchCustomerDetails(id);
+
+    res.json({ ok: true, results });
+})
+
+const customer_payment = asyncHandler( async (req, res) => {
+    await makePayment();
+    res.json({ ok: true });
+})
+
+module.exports = { signup, login, account_summary, customer_payment };

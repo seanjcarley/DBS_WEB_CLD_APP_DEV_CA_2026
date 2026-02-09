@@ -1,14 +1,30 @@
 import React, { useState } from "react";
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useAuth } from "../auth/authContext";
 
 const AuthNavBar = ({onMenuClick}) => {
+    const { logout } = useAuth;
+    const nav = useNavigate();
     const [page, setPage] = useState('');
+    const [loading, setLoading] = useState('');
+    const [error, setError] = useState('');
 
-    const logout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('ID');
+    async function accountLogout(e) {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            await logout();
+            nav('/');
+        } catch {
+            // setError(error.message);
+        } finally {
+            setLoading(false);
+        }
     }
+    
 
     return (
         <AppBar position="static">
@@ -49,7 +65,7 @@ const AuthNavBar = ({onMenuClick}) => {
                         color="inherit" 
                         component={Link} 
                         to="/" 
-                        onClick={logout}
+                        onClick={accountLogout}
                     >
                         Log Out
                     </Button>

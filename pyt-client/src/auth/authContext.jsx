@@ -18,17 +18,18 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
     const [token, setTokenState] = useState(getToken());
-    const payload = useMemo(() => decodePayload(token), [token]);
+    // const payload = useMemo(() => decodePayload(token), [token]);
 
     async function login(email, password) {
-        const data = await apiFetch('/api/auth.login', {
+        const data = await apiFetch('/api/auth/login', {
             method: 'POST', 
             auth: false,
             body: { email, password }
         });
-        storeToken(data.token);
+        storeToken(data.token, data.id);
         setTokenState(data.token);
-        return data
+        // console.log(data);
+        return data;
     }
 
     function logout() {

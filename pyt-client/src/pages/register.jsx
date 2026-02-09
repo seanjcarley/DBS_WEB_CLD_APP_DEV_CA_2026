@@ -4,7 +4,6 @@ import { Accordion, AccordionActions, AccordionDetails, AccordionSummary,
     TextField, Typography } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import UnauthNavBar from "../components/UnauthNavBar";
-import axios from "axios";
 import Validator from 'validator';
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../api/client";
@@ -66,18 +65,18 @@ export default function Register() {
     // validate that the provided passwordmeets minimum requirements
     const validatePwd = (password) => {
         if (Validator.isStrongPassword(password)) {
-            setPwrd(password);
+            setPassword(password);
             setPwrdAlert('Password meets minimum requirements!');
             setPwrdAlrtClr('green');
         } else {
-            setPwrd('');
+            setPassword('');
             setPwrdAlert('Password does not meet minimum requirements!');
             setPwrdAlrtClr('red');
         }
     };
     // validate that the provided passwords match
     const validatePwdMatch = (cnfpwd) => {
-        if (cnfpwd === pwrd) {
+        if (cnfpwd === password) {
             setCnfpwAlert('Passwords match!');
             setCnfpwAlrtClr('green');
             setCnfpw('match')
@@ -91,11 +90,10 @@ export default function Register() {
         e.preventDefault();
         setError('');
         setLoading(true);
-
         try {
             const payload = {
                 email: email.trim(),
-                password,
+                password: password.trim(),
                 fname: fname.trim(),
                 surname: surname.trim(),
                 phone: phone.trim(),
@@ -122,42 +120,6 @@ export default function Register() {
             setLoading(false);
         }
     }
-
-}
-
-const Register = () => {
-    
-
-    // handle vehicle search
-    const handleVehicleSearch = async (e) => {
-        e.preventDefault();
-        const res = await axios.post('http://localhost:5000/api/vehicle_search'
-            , {vrn: vrn});
-        
-        setDetails(res.data);
-        setOpen(true);
-
-    };
-
-    // handle customer registration 
-    const handleRegistration = async (e) => {
-        e.preventDefault();
-        
-        if (!email || !pwrd || !cnfpwd || !fname || !surname || ! phone || !vrn) {
-            setError('Please fill in all required fields!');
-            return;
-        }
-        
-        await axios.post('http://localhost:5000/api/register', {
-            email: email,
-            password: pwrd,
-            fname: fname,
-            surname: surname,
-            phone: phone,
-            vrn: vrn,
-        })
-        navigate('/signin');
-    };
 
     return (
         <>
@@ -199,7 +161,12 @@ const Register = () => {
                             required
                             onChange={ e => validateEmail(e.target.value)}
                             />
-                        <Typography variant="caption" sx={{ color: emlAlrtClr }}>
+                        <Typography 
+                            variant="caption" 
+                            sx={{ 
+                                color: emlAlrtClr 
+                            }}
+                        >
                             { emailAlert }
                         </Typography>
             
@@ -211,7 +178,12 @@ const Register = () => {
                             required
                             onChange={ e => validatePwd(e.target.value)}
                             />
-                        <Typography variant="caption" sx={{ color: pwrdAlrtClr }}>
+                        <Typography 
+                            variant="caption" 
+                            sx={{ 
+                                color: pwrdAlrtClr 
+                            }
+                        }>
                             { pwrdAlert }
                         </Typography>
             
@@ -223,7 +195,12 @@ const Register = () => {
                             required
                             onChange={ e => validatePwdMatch(e.target.value)}
                         />
-                        <Typography variant="caption" sx={{ color: cnfpwAlrtClr }}>
+                        <Typography 
+                            variant="caption" 
+                            sx={{ 
+                                color: cnfpwAlrtClr 
+                            }}
+                        >
                             { cnfpwAlert }
                         </Typography>
                     </AccordionDetails>
@@ -297,20 +274,18 @@ const Register = () => {
                                 gridTemplateColumns: 'repeat(2, minmax(min(200px, 50%), 1fr))',
                                 gap: 2
                             }}
-                            >
-                            
+                        >
                             <TextField
                                 label='Vehicle Registration Number (VRN)'
                                 onChange={ e => setVrn(e.target.value) }
                                 sx={{ mt: 1}}
                                 required
                                 />
-            
                             <Button
                                 id="vehicle-search-btn"
                                 variant="contained"
                                 color="primary"
-                                onClick={handleVehicleSearch}
+                                // onClick={handleVehicleSearch}
                                 >
                                 Find Vehicle
                             </Button>
@@ -319,20 +294,22 @@ const Register = () => {
                 </Accordion>
                 <Box
                     align='center'
-                    sx={{ width: '100%' }}
-                    
-                    >
+                    sx={{ 
+                        width: '100%' 
+                    }}    
+                >
                     <Button
                         variant="contained"
                         color="secondary"
                         sx={{ mt: 2 }}
-                        onClick={handleRegistration}
+                        onClick={onSubmit}
                         >
                         Register
                     </Button>
                 </Box>
             </Container>
             
+            {/* modal */}
             <Container>
                 <Modal
                     open={open}
@@ -358,7 +335,7 @@ const Register = () => {
                             Please check that the details below match your 
                             vehicle { vrn }: 
                         </Typography>
-                        <List>
+                        {/* <List>
                             <ListItem>
                                 Vehicle Make: { details.VEHICLEMAKE}
                             </ListItem>
@@ -371,7 +348,7 @@ const Register = () => {
                             <ListItem>
                                 Vehicle Class: { details.VEHICLECLASS }
                             </ListItem>
-                        </List>
+                        </List> */}
                         <Box align='center'>
                             <Button 
                                 variant="contained" 

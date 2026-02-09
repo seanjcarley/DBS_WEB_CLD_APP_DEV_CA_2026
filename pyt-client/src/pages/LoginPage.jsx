@@ -37,7 +37,7 @@ export default function LoginPage() {
                     mt: 10,
                 }}
                 align='center'
-                >
+            >
                 <Paper 
                     sx={{ p: 5 }}>
                     <Typography 
