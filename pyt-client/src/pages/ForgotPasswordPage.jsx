@@ -1,32 +1,34 @@
 import React, { useState } from "react";
 import { Alert, Button, Container, Paper, Stack, TextField, 
     Typography } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authContext";
 import UnauthNavBar from "../components/UnauthNavBar";
 
-export default function LoginPage() {
-    const { login } = useAuth();
+
+export default function ForgotPassswordPage() {
+    const { forgot_password } = useAuth();
     const nav = useNavigate();
 
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [accountNumber, setAccountNumber] = useState('');
     const [loading, setLoading] = useState('');
     const [error, setError] = useState('');
-
+    
     async function onSubmit(e) {
         e.preventDefault();
         setError('');
         setLoading(true);
         try {
-            await login(email, password);
-            nav(`/account_summary`);
+            await forgot_password(email, accountNumber);
+            nav(`/reset_password`);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
     }
+    
 
     return (
         <>
@@ -39,8 +41,7 @@ export default function LoginPage() {
                 align='center'
             >
                 <Paper 
-                    sx={{ p: 5 }}
-                >
+                    sx={{ p: 5 }}>
                     <Typography 
                         variant="h4" 
                         align="center" 
@@ -49,19 +50,30 @@ export default function LoginPage() {
                             mt: 2,
                         }}
                     >
-                        Login
+                        Forgot Password
+                    </Typography>
+                    <Typography
+                        variant="caption"
+                        align="center"
+                        color="secondary"
+                        sx={{
+                            mt:2
+                        }}
+                    >
+                        To reset your password, please provide your email and 
+                        account number!
                     </Typography>
                     {error && (
-                        <Alert severity='error' sx={{ mt: 2 }}>{error}</Alert>
+                        <Alert severity="error" sx={{ mt: 2}}>{error}</Alert>
                     )}
                     <Stack 
                         component='form' 
                         spacing={2} 
-                        onSubmit={onSubmit} 
                         sx={{ 
                             mt : 2
                         }}
-                        >
+                        onSubmit={onSubmit}
+                    >
                         <TextField
                             fullWidth
                             required
@@ -69,15 +81,14 @@ export default function LoginPage() {
                             type="email"
                             label='Email'
                             onChange={ e => setEmail(e.target.value) }
-                            />
+                        />
                         <TextField
                             fullWidth
                             required
                             sx={{ mt: 3 }}
-                            type="password"
-                            label='Password'
-                            onChange={ e => setPassword(e.target.value) }
-                            />
+                            label='Account Number'
+                            onChange={ e => setAccountNumber(e.target.value) }
+                        />
                         <Button
                             variant="contained"
                             color="secondary"
@@ -85,18 +96,7 @@ export default function LoginPage() {
                             type='submit'
                             disabled={loading}
                         >
-                            {loading ? 'Logging in...' : 'Login'}
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            color="secondary"
-                            sx={{ mt: 2 }}
-                            type='submit'
-                            disabled={loading}
-                            component={Link}
-                            to='/forgot_password'
-                        >
-                            Forgot Password
+                            {loading ? 'Submitting...' : 'Submit'}
                         </Button>
                     </Stack>
                 </Paper>

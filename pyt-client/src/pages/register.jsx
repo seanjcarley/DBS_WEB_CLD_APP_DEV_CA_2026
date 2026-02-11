@@ -92,16 +92,16 @@ export default function Register() {
         setLoading(true);
         try {
             const payload = {
-                email: email.trim(),
-                password: password.trim(),
-                fname: fname.trim(),
-                surname: surname.trim(),
-                phone: phone.trim(),
-                vrn: vrn.trim(),
+                email: email,
+                password: password,
+                fname: fname,
+                surname: surname,
+                phone: phone,
+                vrn: vrn,
             }
             
             // used for debug (to be commented/removed)
-            console.log(payload);
+            // console.log(payload);
 
             // register user
             await apiFetch('/api/auth/register', {

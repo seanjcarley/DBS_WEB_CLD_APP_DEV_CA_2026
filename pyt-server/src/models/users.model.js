@@ -15,9 +15,9 @@ async function findUserByEmail(email) {
 
 // user registration
 async function createUser({email, password, fname, surname, phone, vrn}) {
-    console.log({email, password, fname, surname, phone, vrn});
+    // console.log({email, password, fname, surname, phone, vrn});
     const [result] = await db.query(
-        `call sp_AddCustomer(?, ?, ?, ?, ?, ?);`, 
+        `call sp_AddCustomer(?, ?, ?, ?, ?, ?)`, 
         [email, password, fname, surname, phone, vrn]
     );
     return result.insertId;
@@ -27,15 +27,15 @@ async function createUser({email, password, fname, surname, phone, vrn}) {
 async function fetchCustomerDetails(id) {
     const results = [];
     const [rows_pd] = await db.query(
-        `call sp_AccountSummary_1(?);`, [id]
+        `call sp_AccountSummary_1(?)`, [id]
     );
 
     const [rows_vd] = await db.query(
-        `call sp_AccountSummary_2(?);`, [id]
+        `call sp_AccountSummary_2(?)`, [id]
     );
 
     const [rows_jd] = await db.query(
-        `call sp_AccountSummary_3(?);`, [id]
+        `call sp_AccountSummary_3(?)`, [id]
     )
     results.push(rows_pd[0]);
     results.push(rows_vd[0]);
@@ -44,4 +44,13 @@ async function fetchCustomerDetails(id) {
     return results || null;
 }
 
-module.exports = { createUser, findUserByEmail, fetchCustomerDetails };
+async function resetPassword(password, id) {
+    const [result] = await db.query(
+        `call sp_ResetPassword(?, ?)`, [password, id]
+    )
+    
+    return result || null;
+}
+
+module.exports = { createUser, findUserByEmail, fetchCustomerDetails, 
+    resetPassword };

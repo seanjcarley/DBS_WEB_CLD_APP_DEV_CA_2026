@@ -16,6 +16,7 @@ const Index = () => {
                 <Typography 
                     variant='h2' 
                     align='center'
+                    color='primary'
                 >
                     Welcome to Pay your Toll!
                 </Typography>

@@ -24,11 +24,23 @@ export function AuthProvider({ children }) {
         const data = await apiFetch('/api/auth/login', {
             method: 'POST', 
             auth: false,
-            body: { email, password }
+            body: { email, password },
         });
         storeToken(data.token, data.id);
         setTokenState(data.token);
         // console.log(data);
+        return data;
+    }
+
+    async function forgot_password(email, accountNumber) {
+        // console.log(`authContext: ${email} + ${accountNumber}`);
+        const data = await apiFetch('/api/auth/forgot_password', {
+            method: 'POST',
+            auth: false,
+            body: { email, accountNumber },
+        });
+        storeToken(data.token, data.id);
+        setTokenState(data.token);
         return data;
     }
 
@@ -37,7 +49,7 @@ export function AuthProvider({ children }) {
         setTokenState(null);
     }
 
-    const value = { token, login, logout, isAuthed: !!token };
+    const value = { token, login, logout, forgot_password, isAuthed: !!token };
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

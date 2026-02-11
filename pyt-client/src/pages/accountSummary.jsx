@@ -3,7 +3,7 @@ import { Box, Button, Card, CircularProgress, Container, IconButton, List,
     ListItem, Typography, TextField } from "@mui/material";
 import AuthNavBar from "../components/AuthNavBar";
 import Validator from 'validator';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -20,29 +20,38 @@ const AccountSummary = () => {
     const [custDetails, setCustDetails] = useState([]);
     const [custVehDetails, setCustVehDetails] = useState([]);
     const [custJrnDetails, setCustJrnDetails] = useState([]);
+    
     // variables to set visibility of customer details edit buttons
     const [detailsBtnDisplay, setDetailsBtnDisplay] = useState('inline-flex')
     const [saveBtnDisplay, setSaveBtnDisplay] = useState('none')
-    // variables to set text field state (disabled or not)
-    const [fnameState, setFnameState] = useState(true);
-    const [snameState, setSnameState] = useState(true);
-    const [emailState, setEmailState] = useState(true);
-    const [phoneState, setPhoneState] = useState(true);
+    
     // variables for validation error alerts
     const [emailAlert, setEmailAlert] = useState('');
     const [emlAlrtClr, setEmlAlrtClr] = useState('');
+    
     // set the customer details variables
     const [fname, setFname] = useState('');
+    const [tempFname, setTempFname] = useState('');
+    const [fnameLabel, setFnameLabel] = useState('First Name');
     const [surname, setSurname] = useState('');
+    const [tempSname, setTempSname] = useState('');
+    const [snameLabel, setSnameLabel] = useState('Surname');
     const [email, setEmail] = useState('');
+    const [tempEmail, setTempEmail] = useState('');
+    const [emailLabel, setEmailLabel] = useState('Email');
     const [phone, setPhone] = useState('');
+    const [tempPhone, setTempPhone] = useState('');
+    const [phoneLabel, setPhoneLabel] = useState('Phone');
+    
     // set the loading state to show the spinner if required
     const [loading, setLoading] = useState(true);
+    
     // set the token and custID variables
     const token = localStorage.getItem('token');
     const custID = localStorage.getItem('id');
 
     const [error, setError] = useState('')
+    const nav = useNavigate();
     
     // get the users details
     useEffect(() => {
@@ -73,26 +82,60 @@ const AccountSummary = () => {
     }, []);
         
     const editDetails = () => {
+        setFname(custDetails[0].FIRSTNAME);
+        setSurname(custDetails[0].SURNAME);
+        setEmail(custDetails[0].EMAIL);
+        setPhone(custDetails[0].Phone);
         setDetailsBtnDisplay('none');
         setSaveBtnDisplay('inline-flex');
+        setFnameLabel(fname);
+        setSnameLabel(surname);
+        setEmailLabel(email);
+        setPhoneLabel(phone);
     };
 
     const saveDetails = () => {
         setDetailsBtnDisplay('inline-flex');
         setSaveBtnDisplay('none');
+        setFnameLabel('First Name');
+        setSnameLabel('Surname');
+        setEmailLabel('Email');
+        setPhone('Phone');
+        setFname(tempFname);
+        setSurname(tempSname);
+        setEmail(tempEmail);
+        setPhone(tempPhone);
     };
 
     const validateEmail = (email) => {
         if (Validator.isEmail(email)) {
-            setEmail(email);
+            setTempEmail(email);
             setEmailAlert('Valid Email Address Format!');
             setEmlAlrtClr('green');
         } else {
-            setEmail('');
+            setTempEmail('');
             setEmailAlert('Enter a Valid Email Address!');
             setEmlAlrtClr('red');
         }
     };
+
+    async function onSubmitVehicle(e) {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            await apiFetch('/api/vehicles/vehicles', {
+                method: 'POST',
+                auth: true,
+                body: {id: custID,},
+            });
+            nav(`/vehicles`);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false)
+        }
+    }
 
 
     if (loading) return <Box sx={{textAlign: 'center', mt: 10}}>
@@ -173,27 +216,27 @@ const AccountSummary = () => {
                         {custDetails.map((detail) => (
                             <>
                                 <TextField
-                                    label='First Name'
+                                    label={fnameLabel}
                                     sx={{ 
                                         mt: 1, 
                                         display: saveBtnDisplay,
                                         width: '80%' 
                                     }}
-                                    value={fname}
+                                    value=''
                                     onChange={ 
-                                        e => setFname(e.target.value) 
+                                        e => setTempFname(e.target.value) 
                                     }
                                 />
                                 <TextField
-                                    label='Surname'
+                                    label={snameLabel}
                                     sx={{ 
                                         mt: 1, 
                                         display: saveBtnDisplay,
                                         width: '80%' 
                                     }}
-                                    value={surname}
+                                    value=''
                                     onChange={ 
-                                        e => setSurname(e.target.value) 
+                                        e => setTempSname(e.target.value) 
                                     }
                                 />
                                 <TextField
@@ -202,9 +245,9 @@ const AccountSummary = () => {
                                         display: saveBtnDisplay,
                                         width: '80%' 
                                     }}
-                                    label='Email'
+                                    label={emailLabel}
                                     type="email"
-                                    value={email}
+                                    value=''
                                     onChange={ 
                                         e => validateEmail(e.target.value)
                                     }
@@ -219,21 +262,21 @@ const AccountSummary = () => {
                                     {emailAlert}
                                 </Typography>
                                 <TextField
-                                    label='Phone'
+                                    label={phoneLabel}
                                     type='tel'
                                     sx={{ 
                                         mt: 1, 
                                         display: saveBtnDisplay,
                                         width: '80%' 
                                     }}
-                                    value={phone}
+                                    value=''
                                     onChange={ 
-                                        e => setPhone(e.target.value) 
+                                        e => setTempPhone(e.target.value) 
                                     }
                                 />
                                 {/*  */}
                                 <TextField
-                                    label='First Name'
+                                    label={fnameLabel}
                                     sx={{ 
                                         mt: 1, 
                                         display: detailsBtnDisplay,
@@ -243,7 +286,7 @@ const AccountSummary = () => {
                                     disabled
                                 />
                                 <TextField
-                                    label='Surname'
+                                    label={snameLabel}
                                     sx={{ 
                                         mt: 1, 
                                         display: detailsBtnDisplay,
@@ -258,13 +301,13 @@ const AccountSummary = () => {
                                         display: detailsBtnDisplay,
                                         width: '80%' 
                                     }}
-                                    label='Email'
+                                    label={emailLabel}
                                     type="email"
                                     value={detail.EMAIL}
                                     disabled
                                 />
                                 <TextField
-                                    label='Phone'
+                                    label={phoneLabel}
                                     type='tel'
                                     sx={{ 
                                         mt: 1, 
@@ -289,14 +332,26 @@ const AccountSummary = () => {
                                 Edit Details
                             </Button>
                             <Button
-                                variant="outlined"
+                                variant="contained"
                                 color="primary"
                                 sx={{
                                     display: saveBtnDisplay,
+                                    m: 1,
                                 }}
                                 onClick={saveDetails}
                             >
                                 Update Details
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                sx={{
+                                    display: saveBtnDisplay,
+                                    m: 1,
+                                }}
+                                onClick={saveDetails}
+                            >
+                                Cancel
                             </Button>
                         </Box>
                     </Box>
@@ -344,8 +399,7 @@ const AccountSummary = () => {
                         <Button
                             variant="contained"
                             color="primary"
-                            component={Link}
-                            to='/vehicles'
+                            onClick={onSubmitVehicle}
                         >
                             Manage Vehicles
                         </Button>
