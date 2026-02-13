@@ -14,11 +14,11 @@ async function findUserByEmail(email) {
 }
 
 // user registration
-async function createUser({email, password, fname, surname, phone, vrn}) {
-    // console.log({email, password, fname, surname, phone, vrn});
+async function createUser({passwordHash, email, fname, surname, phone, vrn}) {
+    console.log('Model: ', {passwordHash, email, fname, surname, phone, vrn});
     const [result] = await db.query(
         `call sp_AddCustomer(?, ?, ?, ?, ?, ?)`, 
-        [email, password, fname, surname, phone, vrn]
+        [passwordHash, email, fname, surname, phone, vrn]
     );
     return result.insertId;
 }
@@ -45,6 +45,7 @@ async function fetchCustomerDetails(id) {
 }
 
 async function resetPassword(password, id) {
+    console.log('Model: ', password)
     const [result] = await db.query(
         `call sp_ResetPassword(?, ?)`, [password, id]
     )

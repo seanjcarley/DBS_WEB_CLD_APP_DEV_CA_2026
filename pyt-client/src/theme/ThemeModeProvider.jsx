@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo, useState } from "react";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
-import Image from '../assets/background-1.png'
+import Image from '../assets/background.png'
 
 const ThemeModeContext = createContext(null);
 
@@ -9,10 +9,27 @@ export function ThemeModeProvider({children}) {
 
     const theme = useMemo( () => createTheme({
         palette: {
-            primary: {main: '#00376c;',},
-            secondary: {main: '#85267a',},
+            mode, 
+            primary: {
+                main: '#00376c;',
+                dark: '#00264b',
+                light: '#335f89',
+                contrastText: '#e2eef5',
+            },
+            secondary: {
+                main: '#85267a',
+                dark: '#5d1a55',
+                light: '#9d5194',
+                contrastText: '#f2e4ee',
+            },
+            text: {
+                primary: '#00376c;',
+            },
+            background: {
+                default: '#b7e7ff',
+            },
         }, 
-        shape: { borderRadius: 15 },
+        shape: { borderRadius: 10 },
         typography: {
             fontFamily: [
                 'Roboto',
@@ -26,7 +43,7 @@ export function ThemeModeProvider({children}) {
             MuiCssBaseline: {
                 styleOverrides: {
                     body: {
-                        backgroundColor: '#b7e7ff',
+                        // backgroundColor: '#b7e7ff',
                         backgroundImage: `url(${Image})`,
                     }
                 }
@@ -34,7 +51,7 @@ export function ThemeModeProvider({children}) {
             MuiCard: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: 'whitesmoke',
+                        // backgroundColor: '#e2eef5',
                     },
                 },
             },
@@ -45,15 +62,48 @@ export function ThemeModeProvider({children}) {
                     }
                 }
             },
-            MuiButton:{
+            MuiButton: {
                 styleOverrides: {
                     root: {
 
                     }
                 }
+            },
+            MuiTableCell: {
+                styleOverrides: {
+                    root: {
+                        padding: 8
+                    }
+                }
+            },
+            MuiAccordionSummary: {
+                styleOverrides: {
+                    root: {
+                        backgroundColor: '',
+                    }
+                }
             }
-        } 
+        },
     }),[mode]);
+
+    const darkTheme = createTheme({
+        palette: {
+            mode: 'dark',
+            background: {
+                default: '#070B34'
+            }
+        },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: {
+                    body: {
+                        // backgroundColor: '#070B34',
+                        backgroundImage: `url(${Image})`,
+                    }
+                }
+            },
+        },
+    });
 
     const toggleMode = () => setMode((m) => (m === 'light' ? 'dark' : 'light'));
 

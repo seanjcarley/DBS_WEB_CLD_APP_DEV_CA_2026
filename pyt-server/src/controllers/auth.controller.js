@@ -6,7 +6,9 @@ const { createUser, findUserByEmail,
     fetchCustomerDetails, resetPassword } = require('../models/users.model');
 
 const signup = asyncHandler(async (req, res) => {
-    const { email, password, fname, surname, phone, vrn } = req.body;
+    const {password, email, fname, surname, phone, vrn } = req.body;
+
+    console.log(req.body);
 
     const existing = await findUserByEmail(email);
     if (existing) {
@@ -15,16 +17,9 @@ const signup = asyncHandler(async (req, res) => {
         throw err;
     }
     
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const userId = await createUser({
-        email, 
-        passwordHash, 
-        fname, 
-        surname, 
-        phone, 
-        vrn
-    });
+    const passwordHash = await bcrypt.hash(password, 10).catch(console.error)
+    
+    const userId = await createUser({passwordHash, email, fname, surname, phone, vrn});
 
     res.status(201).json({ ok: true, userId });
 });
@@ -72,7 +67,7 @@ const forgot_password = asyncHandler(async (req, res) => {
 const reset_password = asyncHandler(async (req, res) => {
     const { password, id } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
-
+    console.log(passwordHash);
     const results = await resetPassword(passwordHash, Number(id));
 
     res.json({ok: true, results});

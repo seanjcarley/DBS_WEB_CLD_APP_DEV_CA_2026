@@ -1,6 +1,6 @@
 const { env } = require('../config/env');
 const { asyncHandler } = require('../utils/asyncHandler');
-const { fetchAccountVehicles } = require('../models/vehicle.model')
+const { fetchAccountVehicles, addVehicle, searchVehicle } = require('../models/vehicle.model')
 
 const vehicles = asyncHandler(async (req, res) => {
     const id = Number(req.body.id);
@@ -10,4 +10,19 @@ const vehicles = asyncHandler(async (req, res) => {
     res.status(200).json({ ok: true, results });
 })
 
-module.exports = { vehicles };
+const add_vehicle = asyncHandler(async (req, res) => {
+    const {id, vrn} = req.body;
+
+    const vehicleId = await addVehicle({id, vrn});
+
+    res.status(201).json({ ok: true, vehicleId })
+})
+
+const search_vehicle = asyncHandler( async (req, res) => {
+    const vrn = req.body.vrn;
+    const results = await searchVehicle(vrn);
+
+    res.status(200).json({ ok: true, results});
+})
+
+module.exports = { vehicles, add_vehicle, search_vehicle };

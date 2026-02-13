@@ -10,8 +10,8 @@ async function fetchAccountVehicles(id) {
         `call sp_FetchAccountInactiveVehicles(?)`, [Number(id)]
     );
 
-    console.log(rows_act[0]);
-    console.log(rows_ina[0]);
+    // console.log(rows_act[0]);
+    // console.log(rows_ina[0]);
     results.push(rows_act[0]);
     if (rows_ina) {
         results.push(rows_ina[0]);
@@ -24,4 +24,25 @@ async function fetchAccountVehicles(id) {
     return results || null;
 }
 
-module.exports = { fetchAccountVehicles };
+async function addVehicle(id, vrn) {
+    const vehicleId = await db.query(
+        `call sp_AddVehicle(?, ?)`, [id, vrn]
+    );
+
+    console.log('Add vehicle: ', vehicleId)
+
+    return vehicleId || null;    
+}
+
+async function searchVehicle(vrn) {
+    const [results] = await db.query(
+        `call sp_SearchVehicleDetails(?)`, [vrn]
+    );
+
+    console.log('Vehicle.Model: ',results);
+    return results || null;
+}
+
+
+
+module.exports = { fetchAccountVehicles, addVehicle, searchVehicle };

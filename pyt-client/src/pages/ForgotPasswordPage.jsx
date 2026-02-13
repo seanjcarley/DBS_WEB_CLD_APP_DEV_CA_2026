@@ -4,6 +4,7 @@ import { Alert, Button, Container, Paper, Stack, TextField,
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authContext";
 import UnauthNavBar from "../components/UnauthNavBar";
+import UnauthSideBar from '../components/UnauthSideBar';
 
 
 export default function ForgotPassswordPage() {
@@ -14,6 +15,7 @@ export default function ForgotPassswordPage() {
     const [accountNumber, setAccountNumber] = useState('');
     const [loading, setLoading] = useState('');
     const [error, setError] = useState('');
+    const [open, setOpen] = useState(false);
     
     async function onSubmit(e) {
         e.preventDefault();
@@ -32,7 +34,8 @@ export default function ForgotPassswordPage() {
 
     return (
         <>
-            <UnauthNavBar />
+            <UnauthNavBar onMenuClick={ () => setOpen(true) } />
+            <UnauthSideBar open={open} onClose={() => setOpen(false)} />
             <Container
                 maxWidth='sm'
                 sx={{ 

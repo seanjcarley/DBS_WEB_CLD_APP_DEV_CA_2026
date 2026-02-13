@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Button, Card, CardContent, Container, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Container, Grid, 
+    Typography } from '@mui/material';
 import UnauthNavBar from '../components/UnauthNavBar';
+import UnauthSideBar from '../components/UnauthSideBar';
 import { Link } from 'react-router-dom';
 
 const Index = () => {
@@ -9,6 +11,7 @@ const Index = () => {
     return (
         <>
             <UnauthNavBar onMenuClick={ () => setOpen(true) } />
+            <UnauthSideBar open={open} onClose={() => setOpen(false)} />
             <Container
                 maxWidth='md'
                 sx={{ mt: 10}}
@@ -20,83 +23,155 @@ const Index = () => {
                 >
                     Welcome to Pay your Toll!
                 </Typography>
-                <Card sx={{ mb: 3 }}>
-                    <CardContent>
-                        <Typography variant='subtitle1'align='center'>
-                            At Pay Your Toll, you can easilly pay for a trip 
-                            you have made, or will make, on the M50 Toll Road. 
-                            You can also register your details allowing you to 
-                            save upto €1.00 per trip.
-                        </Typography>
-                    </CardContent>
-                </Card>
                 <Box
                     sx={{ 
-                        width: '100%',
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(3, minmax(min(200px, 33%), 1fr))',
+                        width: '90%',
                         gap: 2,
-                        mt: 10,
+                        mt: 7,
+                        mx: 'auto',
+                        flexGrow: 1,
                     }}
                 >
-                    <Card sx={{ mb: 2 }}>
-                        <CardContent align='center'>
-                            <Typography variant='subtitle1' sx={{ mt: 2 }}>
-                                Have you made a trip, or are you planning on 
-                                making one?
-                            </Typography>
-                            <Button
-                                fullWidth
-                                variant='contained'
-                                color='secondary'
-                                sx={{ mt: 2, mb: 2 }}
-                                component={Link}
-                                to='/create-checkout-session'
-                            >
-                                <Typography variant='button'>
-                                    Make a Payment
-                                </Typography>
-                            </Button>
-                            <Typography variant='caption'>
-                                you will need your Vehicle Registration Number 
-                                and your Credit/Debit Card
+                    <Card sx={{ mb: 3 }}>
+                        <CardContent>
+                            <Typography variant='subtitle1'align='center'>
+                                At Pay Your Toll, you can easilly pay for a trip 
+                                you have made, or will make, on the Toll Road. 
+                                You can also register your details allowing you to 
+                                save up to €1.00 per trip.
                             </Typography>
                         </CardContent>
                     </Card>
-                    <Card sx={{ mb: 2 }}>
-                        <CardContent align='center'>
-                            <Typography variant='subtitle1' sx={{ mt: 2 }}>
-                                Register your details with us to make paying 
-                                your toll easier.
-                            </Typography>
-                            <Button
-                                fullWidth
-                                variant='contained'
-                                sx={{ mt: 2 }}
-                                component={Link} 
-                                to="/register"
+                </Box>
+                <Box
+                    sx={{ 
+                        width: '90%',
+                        gap: 2,
+                        mt: 7,
+                        mx: 'auto',
+                        flexGrow: 1,
+                    }}
+                >
+                    <Grid 
+                        container spacing={2}
+                    >
+                        <Grid 
+                            size={{ xs: 10, md: 4 }}
+                            offset={{ xs: 1, md: 0 }}
+                            align='center'
+                        >
+                            <Card sx={{ 
+                                    mb: 2, 
+                                    display: 'flex', 
+                                    justifyContent: 'flex-start',
+                                    flexDirection: 'column',
+                                    height: '100%',
+                                }}
                             >
-                                Register
-                            </Button>
-                        </CardContent>
-                    </Card>
-                    <Card sx={{ mb: 2 }}>
-                        <CardContent align='center'>
-                            <Typography variant='subtitle1' sx={{ mt: 3 }}>
-                                Already registered?
-                            </Typography>
-                            <Button
-                                fullWidth
-                                variant='outlined'
-                                color='secondary'
-                                sx={{ mt: 4.5 }}
-                                component={Link} 
-                                to="/signin"
+                                <CardContent align='center'>
+                                    <Button
+                                        fullWidth
+                                        variant='contained'
+                                        color='secondary'
+                                        sx={{ 
+                                            mt: 1, 
+                                            height: '5rem'
+                                        }}
+                                        component={Link}
+                                        to='/create-checkout-session'
+                                    >
+                                        <Typography variant='button'>
+                                            Make a Payment
+                                        </Typography>
+                                    </Button>
+                                    <Typography 
+                                        variant='subtitle1' 
+                                        sx={{ mt: 2 }}
+                                    >
+                                        Have you made a trip, or are you planning on 
+                                        making one?
+                                    </Typography>
+                                    <Typography variant='caption'>
+                                        you will need your Vehicle Registration Number 
+                                        and your Credit/Debit Card
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid 
+                            size={{ xs: 10, md: 4 }}
+                            offset={{ xs: 1, md: 0 }}
+                            align='center'
+                        >
+                            <Card 
+                                sx={{ 
+                                    mb: 1,
+                                    display: 'flex', 
+                                    justifyContent: 'flex-start',
+                                    flexDirection: 'column',
+                                    height: '100%',
+                                }}
                             >
-                                Log In
-                            </Button>
-                        </CardContent>
-                    </Card>
+                                <CardContent align='center'>
+                                    <Button
+                                        fullWidth
+                                        variant='contained'
+                                        sx={{ 
+                                            mt: 1,
+                                            height: '5rem',                                        }}
+                                        component={Link} 
+                                        to="/register"
+                                    >
+                                        Register
+                                    </Button>
+                                    <Typography 
+                                        variant='subtitle1' 
+                                        sx={{ mt: 2 }}
+                                    >
+                                        Register your details with us to make paying 
+                                        your toll easier.
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid 
+                            size={{ xs: 10, md: 4 }}
+                            offset={{ xs: 1, md: 0 }}
+                            align='center'
+                        >
+                            <Card 
+                                sx={{ 
+                                    mb: 2,
+                                    display: 'flex', 
+                                    justifyContent: 'flex-start',
+                                    flexDirection: 'column',
+                                    height: '100%',
+                                }}
+                                
+                            >
+                                <CardContent align='center'>
+                                    <Button
+                                        fullWidth
+                                        variant='outlined'
+                                        color='secondary'
+                                        sx={{ 
+                                            mt: 1,
+                                            height: '5rem'
+                                        }}
+                                        component={Link} 
+                                        to="/signin"
+                                    >
+                                        Log In
+                                    </Button>
+                                    <Typography 
+                                        variant='subtitle1' 
+                                        sx={{ mt: 2 }}>
+                                        Already registered?
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    </Grid>
                 </Box>
             </Container>
         </>

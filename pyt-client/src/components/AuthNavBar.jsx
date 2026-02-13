@@ -24,7 +24,7 @@ const AuthNavBar = ({onMenuClick}) => {
                         component={Link} 
                         to="/account_summary"
                     >
-                        Back to Account Summary
+                        Account Summary
                     </Button>
                     <Button 
                         color="inherit" 

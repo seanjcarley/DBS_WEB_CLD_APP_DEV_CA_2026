@@ -1,7 +1,7 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export function getToken() {
-    localStorage.getItem('token');
+    return localStorage.getItem('token');
 }
 
 export function setToken(token, id) {
@@ -19,7 +19,7 @@ export async function apiFetch(path, {method = 'GET', body, auth = true} = {}) {
 
     if (auth) {
         const token = getToken();
-        if (token) headers['Authorizaton'] = `Bearer ${token}`;
+        if (token) headers['Authorization'] = `Bearer ${token}`;
     }
 
     const res = await fetch(`${BASE_URL}${path}`, {

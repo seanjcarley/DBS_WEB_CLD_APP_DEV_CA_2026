@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Card, CircularProgress, Container, IconButton, List, 
-    ListItem, Typography, TextField } from "@mui/material";
+import { Box, Button, Card, CircularProgress, Container, Grid, IconButton, 
+    List, ListItem, Typography, TextField, TableFooter, } from "@mui/material";
+import { styled } from '@mui/material/styles'
 import AuthNavBar from "../components/AuthNavBar";
 import Validator from 'validator';
 import { Link, useNavigate } from 'react-router-dom'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { apiFetch } from "../api/client";
+import EditIcon from '@mui/icons-material/Edit';
 
 
 
@@ -32,16 +34,29 @@ const AccountSummary = () => {
     // set the customer details variables
     const [fname, setFname] = useState('');
     const [tempFname, setTempFname] = useState('');
-    const [fnameLabel, setFnameLabel] = useState('First Name');
+    const [nameFieldDisp, setNameFieldDisp] = useState('none');
     const [surname, setSurname] = useState('');
     const [tempSname, setTempSname] = useState('');
-    const [snameLabel, setSnameLabel] = useState('Surname');
+    const [snameFieldDisp, setSnameFieldDisp] = useState('none');
     const [email, setEmail] = useState('');
     const [tempEmail, setTempEmail] = useState('');
-    const [emailLabel, setEmailLabel] = useState('Email');
+    const [emailFieldDisp, setEmailFieldDisp] = useState('none');
     const [phone, setPhone] = useState('');
     const [tempPhone, setTempPhone] = useState('');
-    const [phoneLabel, setPhoneLabel] = useState('Phone');
+    const [phoneFieldDisp, setPhoneFieldDisp] = useState('none');
+
+    // used to change the styling of table rows
+    const StyledTableRow = styled(TableRow)(({theme}) => ({
+        '&:nth-of-type(odd)': {
+            backgroundColor: theme.palette.primary.contrastText,
+        },
+        '&:nth-of-type(even)':{
+            backgroundColor: theme.palette.secondary.contrastText,
+        },
+        // '&:last-child': {
+        //     backgroundColor: '#fff'
+        // }
+    }));
     
     // set the loading state to show the spinner if required
     const [loading, setLoading] = useState(true);
@@ -72,8 +87,8 @@ const AccountSummary = () => {
                 setCustDetails(data.results[0]);
                 setCustVehDetails(data.results[1]);
                 setCustJrnDetails(data.results[2]);
-            } catch {
-                setError(error.message || 'Failed to retrieve account details...')
+            } catch (err) {
+                setError(err.message || 'Failed to retrieve account details...')
             } finally {
                 setLoading(false);
             }
@@ -137,6 +152,20 @@ const AccountSummary = () => {
         }
     }
 
+    async function onSubmitPassword(e) {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            await forgot_password(email, accountNumber);
+            nav(`/reset_password`);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
 
     if (loading) return <Box sx={{textAlign: 'center', mt: 10}}>
         <CircularProgress />
@@ -190,275 +219,380 @@ const AccountSummary = () => {
             <Box
                 sx={{
                     width: '90%',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, minmax(min(200px, 33%), 1fr))',
                     gap: 2,
                     mt: 7,
                     mx: 'auto',
+                    flexGrow: 1,
                 }}
             >
-                <Card align='center'
-                    sx={{
-                        display: 'flex', 
-                        justifyContent: 'space-between',
-                        flexDirection: 'column',
-                    }}
+                <Grid 
+                    container 
+                    spacing={2}
                 >
-                    <Typography 
-                        variant="h6" 
-                        sx={{ 
-                            mt: 1
-                        }}
-                    >
-                        Personal Details
-                    </Typography>
-                    <Box>
-                        {custDetails.map((detail) => (
-                            <>
-                                <TextField
-                                    label={fnameLabel}
-                                    sx={{ 
-                                        mt: 1, 
-                                        display: saveBtnDisplay,
-                                        width: '80%' 
+                    <Grid size={{xs: 12, md: 4}}>
+                        <Card align='center'
+                            sx={{
+                                display: 'flex', 
+                                justifyContent: 'space-between',
+                                flexDirection: 'column',
+                                height: '100%',
+                            }}
+                        >
+                            <Box>
+                                {custDetails.map((detail) => (
+                                    <>
+                                        <TableContainer 
+                                            component={Paper}
+                                            sx={{
+                                                width: '96%',
+                                                mt: 1,
+                                            }}
+                                        >
+                                            <Table>
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell 
+                                                            colSpan={3}
+                                                            align='center'
+                                                            sx={{
+                                                                py: 1
+                                                            }}
+                                                        >
+                                                            <Typography 
+                                                                variant="h6" 
+                                                                sx={{ 
+                                                                    mt: 1,
+                                                                }}
+                                                            >
+                                                                Personal Details
+                                                            </Typography>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    <StyledTableRow>
+                                                        <TableCell
+                                                            sx={{
+                                                                py: 1
+                                                            }}
+                                                        >
+                                                            <Typography
+                                                                variant="body2"
+                                                            >
+                                                                Name:
+                                                            </Typography>
+                                                             <TextField 
+                                                                sx={{
+                                                                    display: nameFieldDisp
+                                                                }}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell
+                                                            sx={{
+                                                                py: 1
+                                                            }}
+                                                        >
+                                                            <Typography
+                                                                variant="body1"
+                                                                sx={{
+                                                                    display: 'inline-flex'   
+                                                                }}
+                                                            >
+                                                                {detail.FIRSTNAME}
+                                                            </Typography>
+                                                        </TableCell>
+                                                        <TableCell
+                                                            sx={{
+                                                                py: 1
+                                                            }}
+                                                        >
+                                                            <Button
+                                                                variant='outlined'
+                                                                sx={{
+                                                                    display: 'inline-flex'   
+                                                                }}
+                                                            >
+                                                                <EditIcon />
+                                                            </Button>
+                                                        </TableCell>
+                                                    </StyledTableRow>
+                                                    <StyledTableRow>
+                                                        <TableCell>
+                                                            <Typography
+                                                                variant="body2"
+                                                            >
+                                                                Surname:
+                                                            </Typography>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Typography
+                                                                variant="body1"
+                                                                sx={{
+                                                                    display: 'inline-flex'   
+                                                                }}
+                                                            >
+                                                                {detail.SURNAME}
+                                                            </Typography>
+                                                            <TextField 
+                                                                sx={{
+                                                                    display: snameFieldDisp   
+                                                                }}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Button
+                                                                variant='outlined'
+                                                                sx={{
+                                                                    display: 'inline-flex'   
+                                                                }}
+                                                            >
+                                                                <EditIcon />
+                                                            </Button>
+                                                        </TableCell>
+                                                    </StyledTableRow>
+                                                    <StyledTableRow>
+                                                        <TableCell>
+                                                            <Typography
+                                                                variant="body2"
+                                                            >
+                                                                Email:
+                                                            </Typography>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Typography
+                                                                variant="body1"
+                                                                sx={{
+                                                                    display: 'inline-flex'   
+                                                                }}
+                                                            >
+                                                                {detail.EMAIL}
+                                                            </Typography>
+                                                             <TextField 
+                                                                sx={{
+                                                                    display: emailFieldDisp   
+                                                                }}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Button
+                                                                variant='outlined'
+                                                                sx={{
+                                                                    display: 'inline-flex'   
+                                                                }}
+                                                            >
+                                                                <EditIcon />
+                                                            </Button>
+                                                        </TableCell>
+                                                    </StyledTableRow>
+                                                    <StyledTableRow>
+                                                        <TableCell>
+                                                            <Typography
+                                                                variant="body2"
+                                                            >
+                                                                Phone
+                                                            </Typography>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Typography
+                                                                variant="body1"
+                                                                sx={{
+                                                                    display: 'inline-flex'   
+                                                                }}
+                                                            >
+                                                                {detail.PHONE}
+                                                            </Typography>
+                                                             <TextField 
+                                                                sx={{
+                                                                    display: phoneFieldDisp   
+                                                                }}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Button
+                                                                variant='outlined'
+                                                                sx={{
+                                                                    display: 'inline-flex'   
+                                                                }}
+                                                            >
+                                                                <EditIcon />
+                                                            </Button>
+                                                        </TableCell>
+                                                    </StyledTableRow>
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </>
+                                ))}
+                            </Box>
+                            <Box>
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    sx={{
+                                        my: 1
                                     }}
-                                    value=''
-                                    onChange={ 
-                                        e => setTempFname(e.target.value) 
+                                    onClick={
+                                        onSubmitPassword
                                     }
-                                />
-                                <TextField
-                                    label={snameLabel}
-                                    sx={{ 
-                                        mt: 1, 
-                                        display: saveBtnDisplay,
-                                        width: '80%' 
-                                    }}
-                                    value=''
-                                    onChange={ 
-                                        e => setTempSname(e.target.value) 
-                                    }
-                                />
-                                <TextField
-                                    sx={{ 
-                                        mt: 2, 
-                                        display: saveBtnDisplay,
-                                        width: '80%' 
-                                    }}
-                                    label={emailLabel}
-                                    type="email"
-                                    value=''
-                                    onChange={ 
-                                        e => validateEmail(e.target.value)
-                                    }
-                                />
-                                <Typography 
-                                    variant="caption" 
-                                    sx={{ 
-                                        display: saveBtnDisplay,
-                                        color: emlAlrtClr 
-                                    }}
                                 >
-                                    {emailAlert}
-                                </Typography>
-                                <TextField
-                                    label={phoneLabel}
-                                    type='tel'
-                                    sx={{ 
-                                        mt: 1, 
-                                        display: saveBtnDisplay,
-                                        width: '80%' 
-                                    }}
-                                    value=''
-                                    onChange={ 
-                                        e => setTempPhone(e.target.value) 
-                                    }
-                                />
-                                {/*  */}
-                                <TextField
-                                    label={fnameLabel}
-                                    sx={{ 
-                                        mt: 1, 
-                                        display: detailsBtnDisplay,
-                                        width: '80%' 
-                                    }}
-                                    value={detail.FIRSTNAME}
-                                    disabled
-                                />
-                                <TextField
-                                    label={snameLabel}
-                                    sx={{ 
-                                        mt: 1, 
-                                        display: detailsBtnDisplay,
-                                        width: '80%' 
-                                    }}
-                                    value={detail.SURNAME}
-                                    disabled
-                                />
-                                <TextField
-                                    sx={{ 
-                                        my: 2, 
-                                        display: detailsBtnDisplay,
-                                        width: '80%' 
-                                    }}
-                                    label={emailLabel}
-                                    type="email"
-                                    value={detail.EMAIL}
-                                    disabled
-                                />
-                                <TextField
-                                    label={phoneLabel}
-                                    type='tel'
-                                    sx={{ 
-                                        mt: 1, 
-                                        display: detailsBtnDisplay,
-                                        width: '80%'
-                                    }}
-                                    value={detail.PHONE}
-                                    disabled
-                                    
-                                />
-                            </>
-                        ))}
-                        <Box sx={{ m: 2 }}>
-                            <Button
-                                variant="outlined"
-                                color="secondary"
-                                sx={{
-                                    display: detailsBtnDisplay,
-                                }}
-                                onClick={editDetails}
-                            >
-                                Edit Details
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                sx={{
-                                    display: saveBtnDisplay,
-                                    m: 1,
-                                }}
-                                onClick={saveDetails}
-                            >
-                                Update Details
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                color="primary"
-                                sx={{
-                                    display: saveBtnDisplay,
-                                    m: 1,
-                                }}
-                                onClick={saveDetails}
-                            >
-                                Cancel
-                            </Button>
-                        </Box>
-                    </Box>
-                </Card>
-                <Card 
-                    align='center'
-                    sx={{
-                        display: 'flex', 
-                        justifyContent: 'space-between',
-                        flexDirection: 'column',
-                    }}
-                >                   
-                    <Typography 
-                        variant="h6" 
-                        sx={{ 
-                            mt: 1,
-                        }}
-                    >
-                        Vehicle Details
-                    </Typography>
-                    <Typography variant="caption">
-                        Click 'Manage Vehicles' below to add or remove vehicles
-                    </Typography>
-                    <TableContainer component={Paper}>
-                        <Table aria-label = 'Vehicle Table'>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Reg Number</TableCell>
-                                    <TableCell>Make</TableCell>
-                                    <TableCell>Model</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {custVehDetails.map((vehicle) => (
-                                    <TableRow>
-                                        <TableCell>{vehicle.VEHICLEREGNO}</TableCell>
-                                        <TableCell>{vehicle.VEHICLEMAKE}</TableCell>
-                                        <TableCell>{vehicle.VEHICLEMODEL}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <Box sx={{ m: 2, }}>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={onSubmitVehicle}
+                                    Reset Password
+                                </Button>
+                            </Box>
+                        </Card>
+                    </Grid>
+                    <Grid size={{xs: 12, md: 4}}>
+                        <Card 
+                            align='center'
+                            sx={{
+                                display: 'flex', 
+                                justifyContent: 'space-between',
+                                flexDirection: 'column',
+                                height: '100%',
+                            }}
                         >
-                            Manage Vehicles
-                        </Button>
-                    </Box>
-                </Card>
-                <Card 
-                    align='center'
-                    sx={{
-                        display: 'flex', 
-                        justifyContent: 'space-between',
-                        flexDirection: 'column',
-                    }}
-                >
-                    <Typography
-                        variant="h6" 
-                        sx={{ 
-                            mt: 1,
-                        }}
-                    >
-                        Journey Details
-                    </Typography>
-                    <Typography variant="caption">
-                        See the most recent journeys that are still unpaid
-                    </Typography>
-                    <TableContainer component={Paper}>
-                        <Table aria-label = 'Journey Table'>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Reg Number</TableCell>
-                                    <TableCell>Direction</TableCell>
-                                    <TableCell>Date & Time</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {custJrnDetails.map((journey) => (
-                                    <TableRow>
-                                        <TableCell>{journey.VEHICLEREGNO}</TableCell>
-                                        <TableCell>{journey.JOURNEYDIRECTION}</TableCell>
-                                        <TableCell>{journey.JOURNEYDATE}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <Box sx={{ 
-                            m: 2,
-                        }}
-                        
-                    >
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            component={Link}
-                            to='/journeys'
+                            <Box>
+                                <TableContainer 
+                                    component={Paper}
+                                    sx={{
+                                        width: '96%',
+                                        mx: 'auto',
+                                        mt: 1
+                                    }}
+                                    >
+                                    <Table 
+                                        aria-label='Vehicle Table'
+                                        >
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell 
+                                                    colSpan={3}
+                                                    align='center'
+                                                    >
+                                                    <Typography 
+                                                        variant="h6" 
+                                                        sx={{ 
+                                                            mt: 1,
+                                                        }}
+                                                        >
+                                                        Vehicle Details
+                                                    </Typography>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell 
+                                                    colSpan={3}
+                                                    align='center'
+                                                    >
+                                                    <Typography variant="caption">
+                                                        Click 'Manage Vehicles' below to add or remove vehicles
+                                                    </Typography>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>Reg Number</TableCell>
+                                                <TableCell>Make</TableCell>
+                                                <TableCell>Model</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {custVehDetails.map((vehicle) => (
+                                                <StyledTableRow>
+                                                    <TableCell>{vehicle.VEHICLEREGNO}</TableCell>
+                                                    <TableCell>{vehicle.VEHICLEMAKE}</TableCell>
+                                                    <TableCell>{vehicle.VEHICLEMODEL}</TableCell>
+                                                </StyledTableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Box>
+                            <Box>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ my: 1}}
+                                    onClick={onSubmitVehicle}
+                                >
+                                    Manage Vehicles
+                                </Button>
+                            </Box>
+                        </Card>
+                    </Grid>
+                    <Grid size={{xs: 12, md: 4}}>
+                        <Card 
+                            align='center'
+                            sx={{
+                                display: 'flex', 
+                                justifyContent: 'space-between',
+                                flexDirection: 'column',
+                                height: '100%',
+                            }}
                         >
-                            View Journeys
-                        </Button>
-                    </Box>
-                </Card>
+                            <Box>
+                            <TableContainer 
+                                component={Paper}
+                                sx={{
+                                    width: '96%',
+                                    mx: 'auto',
+                                    mt: 1,
+                                }}
+                                >
+                                <Table aria-label = 'Journey Table'>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell colSpan={3} align='center'>
+                                                <Typography
+                                                    variant="h6" 
+                                                    sx={{ 
+                                                        mt: 1,
+                                                    }}
+                                                    >
+                                                    Journey Details
+                                                </Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell 
+                                                colSpan={3} 
+                                                align='center'
+                                                >
+                                                <Typography variant="caption">
+                                                    See the most recent journeys that are still unpaid
+                                                </Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell>Reg Number</TableCell>
+                                            <TableCell>Direction</TableCell>
+                                            <TableCell>Date & Time</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {custJrnDetails.map((journey) => (
+                                            <StyledTableRow>
+                                                <TableCell>{journey.VEHICLEREGNO}</TableCell>
+                                                <TableCell>{journey.JOURNEYDIRECTION}</TableCell>
+                                                <TableCell>{journey.JOURNEYDATE}</TableCell>
+                                            </StyledTableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                            </Box>
+                            <Box>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    component={Link}
+                                    to='/journeys'
+                                    sx={{ my: 1}}
+                                >
+                                    View Journeys
+                                </Button>
+                            </Box>
+                        </Card>
+                    </Grid>
+                </Grid>
             </Box>
         </>
     );
