@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const { z } = require('zod');
 const { validate } = require('../middleware/validate');
-const { vehicles, add_vehicle, search_vehicle } = require('../controllers/vehicle.controler');
+const { vehicles, add_vehicle, search_vehicle, 
+    search_one_auto } = require('../controllers/vehicle.controler');
 
 
 const fetchVehiclesSchema = z.object({
@@ -20,5 +21,6 @@ const searchVehicleSchema = z.object({
 router.post('/vehicles', validate(fetchVehiclesSchema), vehicles);
 router.post('/add_vehicle', validate(addVehicleSchema), add_vehicle);
 router.post('/search_vehicle', validate(searchVehicleSchema), search_vehicle);
+router.get('/search_one_auto/:vrn', search_one_auto);
 
 module.exports = router;

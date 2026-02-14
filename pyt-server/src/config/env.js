@@ -15,6 +15,7 @@ const env = {
     JWT_SECRET: process.env.JWT_SECRET,
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '2h',
     ONEAUTO_SECRET: process.env.ONEAUTO_SECRET,
+    ONEAUTO_BASE_URL: process.env.ONEAUTO_BASE_URL,
     STRIPE_SECRET: process.env.STRIPE_SECRET,
     STRIPE_PUBLIC: process.env.STRIPE_PUBLIC,
     CORS_ORIGIN: process.env.CORS_ORIGIN || '*'

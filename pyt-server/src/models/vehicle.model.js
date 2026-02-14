@@ -1,4 +1,6 @@
+const axios = require('axios');
 const { db } = require('../config/db');
+const { env } = require('../config/env');
 
 // find all active vehicles for account
 async function fetchAccountVehicles(id) {
@@ -19,7 +21,7 @@ async function fetchAccountVehicles(id) {
         results.push([]);
     }
 
-    console.log(results);
+    // console.log(results);
 
     return results || null;
 }
@@ -29,7 +31,7 @@ async function addVehicle(id, vrn) {
         `call sp_AddVehicle(?, ?)`, [id, vrn]
     );
 
-    console.log('Add vehicle: ', vehicleId)
+    // console.log('Add vehicle: ', vehicleId)
 
     return vehicleId || null;    
 }
@@ -39,10 +41,25 @@ async function searchVehicle(vrn) {
         `call sp_SearchVehicleDetails(?)`, [vrn]
     );
 
-    console.log('Vehicle.Model: ',results);
+    // console.log('Vehicle.Model: ',results);
     return results || null;
+}
+
+async function searchOneAuto(vrn) {
+    // console.log('Search One Auto: ', vrn)
+    const results = await axios({
+        'method': 'GET',
+        'url': `${env.ONEAUTO_BASE_URL}/cartell/vehicleidentity/?vehicle_registration_mark=${vrn}`,
+        'headers': {
+            'x-api-key': env.ONEAUTO_SECRET,
+        }
+    });
+
+    // console.log('Vehicle Model: ', results.data.result);
+    return results.data.result || null;
 }
 
 
 
-module.exports = { fetchAccountVehicles, addVehicle, searchVehicle };
+module.exports = { fetchAccountVehicles, addVehicle, 
+    searchVehicle, searchOneAuto };

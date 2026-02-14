@@ -4,12 +4,12 @@ import { Accordion, AccordionDetails, AccordionSummary,
     TextField, Typography, Table, TableBody, TableCell, TableContainer, 
     TableFooter, TableHead, TableRow, } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import UnauthNavBar from "../components/UnauthNavBar";
 import Validator from 'validator';
+import UnauthNavBar from "../components/UnauthNavBar";
+import UnauthSideBar from "../components/UnauthSideBar";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../api/client";
 import { useAuth } from "../auth/authContext";
-import UnauthSideBar from "../components/UnauthSideBar";
 
 export default function Register() {
     const nav = useNavigate();
@@ -31,6 +31,10 @@ export default function Register() {
 
     // variables to hold vehicle details
     const [vrn, setVrn] = useState('');
+    const [vehMk, setVehMk] = useState('');
+    const [vehMdl, setVehMdl] = useState('');
+    const [vehClr, setVehClr] = useState('');
+    const [vehCls, setVehCls] = useState('');
     const [vehDetails, setVehDetails] = useState('');
 
     // variables for validation error alerts
@@ -118,9 +122,40 @@ export default function Register() {
                 auth: false,
                 body: payload,
             });
-            // console.log(data.results[0][0].VEHICLEMAKE);
-            setVehDetails(data.results[0][0]);
+            console.log(data.results[0][0].VEHICLEMAKE);
+            setVehMk(data.results[0][0].VEHICLEMAKE);
+            setVehMdl(data.results[0][0].VEHICLEMODEL);
+            setVehClr(data.results[0][0].VEHICLECOLOUR);
+            setVehCls(data.results[0][0].VEHICLECLASS);
+            // setVehDetails(data.results[0][0]);
 
+            handleOpen();
+        } catch (err) {
+            setError (err.message || 'Vehicle not found...');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // serach for the vehicle details using OneAuto API
+    // the One Auto sandbox environment returns the same vehicle details 
+    // regardless of the Registration Number provided
+    // if the call is successful, details relating to 171XX3 are returned
+    // otherwise, an error is returned
+    async function handleOneAutoVehicleSearch(e) {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            const data = await apiFetch(`/api/vehicles/search_one_auto/${vrn}`, {
+                method: 'GET',
+                auth: false,
+            });
+            // console.log(data.results.manufacturer_desc);
+            setVehMk(data.results.manufacturer_desc);
+            setVehMdl(data.results.model_desc);
+            setVehClr(data.results.colour);
+            setVehCls(data.results.vehicle_tax_type);
             handleOpen();
         } catch (err) {
             setError (err.message || 'Vehicle not found...');
@@ -332,6 +367,7 @@ export default function Register() {
                                     variant="contained"
                                     color="primary"
                                     onClick={handleVehicleSearch}
+                                    // onClick={handleOneAutoVehicleSearch}
                                 >
                                     Find Vehicle
                                 </Button>
@@ -386,7 +422,7 @@ export default function Register() {
                                             <Typography id='modal-description'>
                                                 Please check that the details 
                                                 below match your 
-                                                vehicle { vrn }:  
+                                                vehicle { vrn }:
                                             </Typography>
                                         </TableCell>
                                     </TableRow>
@@ -405,7 +441,7 @@ export default function Register() {
                                                 variant='h6'
                                                 color='secondary'
                                             >
-                                                {vehDetails.VEHICLEMAKE}
+                                                {vehMk}
                                             </Typography>
                                         </TableCell>
                                     </TableRow>
@@ -422,7 +458,7 @@ export default function Register() {
                                                 variant='h6'
                                                 color='secondary'
                                             >
-                                                {vehDetails.VEHICLEMODEL}
+                                                {vehMdl}
                                             </Typography>
                                         </TableCell>
                                     </TableRow>
@@ -439,7 +475,7 @@ export default function Register() {
                                                 variant='h6'
                                                 color='secondary'
                                             >
-                                                {vehDetails.VEHICLECOLOUR}
+                                                {vehClr}
                                             </Typography>
                                         </TableCell>
                                     </TableRow>
@@ -456,7 +492,7 @@ export default function Register() {
                                                 variant='h6'
                                                 color='secondary'
                                             >
-                                                {vehDetails.VEHICLECLASS}
+                                                {vehCls}
                                             </Typography>
                                         </TableCell>
                                     </TableRow>
@@ -467,24 +503,24 @@ export default function Register() {
                                             align='center'
                                         >
                                             <Button 
-                                                variant="contained" 
-                                                color="success"
-                                                onClick={ handleClose }
-                                                sx={{ m: 2}}
-                                            >
-                                                Confirm
-                                            </Button>
-                                        </TableCell>
-                                        <TableCell
-                                            align='center'
-                                        >
-                                            <Button 
                                                 variant="outlined" 
                                                 color="error"
                                                 onClick={ handleCloseReenter }
                                                 sx={{ m: 2}}
                                             >
                                                 Re-enter VRN
+                                            </Button>
+                                        </TableCell>
+                                        <TableCell
+                                            align='center'
+                                        >
+                                            <Button 
+                                                variant="contained" 
+                                                color="success"
+                                                onClick={ handleClose }
+                                                sx={{ m: 2}}
+                                            >
+                                                Confirm
                                             </Button>
                                         </TableCell>
                                     </TableRow>
