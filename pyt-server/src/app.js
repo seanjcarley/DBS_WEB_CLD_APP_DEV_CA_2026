@@ -5,6 +5,8 @@ const { env } = require('./config/env');
 const { errorHandler } = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth.routes');
 const vehicleRoutes = require('./routes/vehicle.routes');
+const paymentRoutes = require('./routes/payment.routes');
+
 
 const app = express();
 app.use(helmet());
@@ -22,8 +24,8 @@ app.get('/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/payments', paymentRoutes);
 
 app.use(errorHandler);
-const stripe = require('stripe')(env.STRIPE_SECRET);
 
 module.exports = { app };

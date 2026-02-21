@@ -27,13 +27,23 @@ async function fetchAccountVehicles(id) {
 }
 
 async function addVehicle(id, vrn) {
+    console.log('Model: ', Number(id), vrn);
     const vehicleId = await db.query(
-        `call sp_AddVehicle(?, ?)`, [id, vrn]
+        `call sp_AddVehicle(?, ?)`, [Number(id), vrn]
     );
 
     // console.log('Add vehicle: ', vehicleId)
-
     return vehicleId || null;    
+}
+
+async function deleteVehicle(id, vrn) {
+    console.log('Model: ', Number(id), vrn);
+    const result = await db.query(
+        `call sp_DeleteVehicle(?, ?)`, [Number(id), vrn]
+    );
+
+    return result || null;
+    
 }
 
 async function searchVehicle(vrn) {
@@ -59,7 +69,5 @@ async function searchOneAuto(vrn) {
     return results.data.result || null;
 }
 
-
-
 module.exports = { fetchAccountVehicles, addVehicle, 
-    searchVehicle, searchOneAuto };
+    searchVehicle, searchOneAuto, deleteVehicle };

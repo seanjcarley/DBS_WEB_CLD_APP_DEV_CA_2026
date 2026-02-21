@@ -7,9 +7,9 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import Validator from 'validator';
 import UnauthNavBar from "../components/UnauthNavBar";
 import UnauthSideBar from "../components/UnauthSideBar";
-import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../api/client";
 import { useAuth } from "../auth/authContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
     const nav = useNavigate();
@@ -238,7 +238,7 @@ export default function Register() {
                                 type="email"
                                 required
                                 onChange={ e => validateEmail(e.target.value)}
-                                />
+                            />
                             <Typography 
                                 variant="caption" 
                                 sx={{ 
@@ -308,7 +308,7 @@ export default function Register() {
                                 label='First Name'
                                 onChange={ e => setFname(e.target.value) }
                                 sx={{ mt: 1 }}
-                                />
+                            />
 
                             <TextField
                                 fullWidth
@@ -316,7 +316,7 @@ export default function Register() {
                                 label='Surname'
                                 onChange={ e => setSurname(e.target.value) }
                                 sx={{ mt: 1 }}
-                                />
+                            />
 
                             <TextField
                                 fullWidth
@@ -325,7 +325,7 @@ export default function Register() {
                                 type='tel'
                                 onChange={ e => setPhone(e.target.value) }
                                 sx={{ mt: 1 }}
-                                />
+                            />
                         </AccordionDetails>
                     </Accordion>
 
@@ -341,7 +341,7 @@ export default function Register() {
                             expandIcon={<ArrowDropDownIcon />}
                             aria-controls="panel3-content"
                             id="panel3-header"
-                            >
+                        >
                             <Typography component='span'>
                                 Add your Vehicle Details
                             </Typography>
@@ -366,8 +366,8 @@ export default function Register() {
                                     id="vehicle-search-btn"
                                     variant="contained"
                                     color="primary"
-                                    onClick={handleVehicleSearch}
-                                    // onClick={handleOneAutoVehicleSearch}
+                                    // onClick={handleVehicleSearch}
+                                    onClick={handleOneAutoVehicleSearch}
                                 >
                                     Find Vehicle
                                 </Button>

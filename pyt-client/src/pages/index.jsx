@@ -13,7 +13,7 @@ const Index = () => {
             <UnauthNavBar onMenuClick={ () => setOpen(true) } />
             <UnauthSideBar open={open} onClose={() => setOpen(false)} />
             <Container
-                maxWidth='md'
+                maxWidth='lg'
                 sx={{ mt: 10}}
             >
                 <Typography 
@@ -25,7 +25,7 @@ const Index = () => {
                 </Typography>
                 <Box
                     sx={{ 
-                        width: '90%',
+                        width: '95%',
                         gap: 2,
                         mt: 7,
                         mx: 'auto',
@@ -45,7 +45,7 @@ const Index = () => {
                 </Box>
                 <Box
                     sx={{ 
-                        width: '90%',
+                        width: '95%',
                         gap: 2,
                         mt: 7,
                         mx: 'auto',
@@ -77,8 +77,8 @@ const Index = () => {
                                             mt: 1, 
                                             height: '5rem'
                                         }}
-                                        component={Link}
-                                        to='/create-checkout-session'
+                                        component={Link} 
+                                        to="/payments"
                                     >
                                         <Typography variant='button'>
                                             Make a Payment

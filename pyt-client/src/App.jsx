@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import { AuthProvider, useAuth } from './auth/authContext';
 import { loadStripe } from '@stripe/stripe-js';
 import { CheckoutProvider } from '@stripe/react-stripe-js/checkout';
-import { Navigate, BrowserRouter as Router, 
-  Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, generatePath, Navigate, Route, 
+  Routes, useParams } from 'react-router-dom';
 import { ThemeModeProvider } from './theme/ThemeModeProvider';
 import Index from './pages/index';
 import Register from './pages/Register';
@@ -13,12 +13,18 @@ import Vehicles from './pages/Vehicles';
 import Journeys from './pages/journeys';
 import ForgotPassswordPage from './pages/ForgotPasswordPage';
 import ResetPassswordPage from './pages/ResetPasswordPage';
-import CheckoutForm from './pages/CheckoutForm';
-import { ThemeProvider, createTheme} from "@mui/material/styles";
+import PaymentForm from './pages/PaymentForm';
+import PaymentSetup from './pages/PaymentSetup';
+import PaymentComplete from './pages/PaymentComplete';
 import './App.css';
 import './parallax.css';
 
-const stripePromise = loadStripe(import.meta.env.STRIPE_PUBLIC);
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC);
+
+const Redirect = ({ to }) => {
+  const params = useParams();
+  return <Navigate to={generatePath(to, params)} replace />;
+}
 
 function RequireAuth({ children }) {
   const { isAuthed } = useAuth();
@@ -27,18 +33,6 @@ function RequireAuth({ children }) {
 }
 
 export default function App() {
-
-  // const promise = useMemo(() => {
-  //   return fetch('/create-checkout-session', {
-  //     method: 'POST',
-  //   })
-  //   .then((res) => res.json())
-  //   .then((data) => data.clientSecret);
-  // }, []);
-
-  // const appearance = {
-  //   theme: stripePromise,
-  // };
 
   return (
     <ThemeModeProvider>
@@ -72,8 +66,27 @@ export default function App() {
               </RequireAuth>
             }
           />
+          <Route
+            path='/add_vehicle'
+            element={
+              <RequireAuth>
+                <Vehicles />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path='/delete_vehicle'
+            element={
+              <RequireAuth>
+                <Vehicles />
+              </RequireAuth>
+            }
+          />
           <Route path='/journeys' element={ <Journeys /> } />
-          <Route path='/create-checkout-session' />
+          <Route path='/payments' element={ <PaymentSetup /> } />
+          {/* <Route path='/payment_form/:priceId/:quantity/:email' element={ <PaymentForm /> } />  */}
+          <Route path='/payment_form/' element={ <PaymentForm /> } /> 
+          <Route path='/payment_completion' element={ <PaymentComplete /> } />
         </Routes>
       </AuthProvider>
     </ThemeModeProvider>

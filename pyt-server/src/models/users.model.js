@@ -25,23 +25,10 @@ async function createUser({passwordHash, email, fname, surname, phone, vrn}) {
 
 // get user details for account summary page
 async function fetchCustomerDetails(id) {
-    const results = [];
-    const [rows_pd] = await db.query(
+    const results= await db.query(
         `call sp_AccountSummary_1(?)`, [id]
     );
-
-    const [rows_vd] = await db.query(
-        `call sp_AccountSummary_2(?)`, [id]
-    );
-
-    const [rows_jd] = await db.query(
-        `call sp_AccountSummary_3(?)`, [id]
-    )
-    results.push(rows_pd[0]);
-    results.push(rows_vd[0]);
-    results.push(rows_jd[0]);
-    // console.log(results);
-    return results || null;
+    return results[0] || null;
 }
 
 async function resetPassword(password, id) {

@@ -28,7 +28,7 @@ export function ThemeModeProvider({children}) {
             background: {
                 default: '#b7e7ff',
             },
-        }, 
+        },
         shape: { borderRadius: 10 },
         typography: {
             fontFamily: [
@@ -51,7 +51,8 @@ export function ThemeModeProvider({children}) {
             MuiCard: {
                 styleOverrides: {
                     root: {
-                        // backgroundColor: '#e2eef5',
+                        backgroundColor: '#e2eef5',
+                        // opacity: '100%',
                     },
                 },
             },
@@ -85,25 +86,6 @@ export function ThemeModeProvider({children}) {
             }
         },
     }),[mode]);
-
-    const darkTheme = createTheme({
-        palette: {
-            mode: 'dark',
-            background: {
-                default: '#070B34'
-            }
-        },
-        components: {
-            MuiCssBaseline: {
-                styleOverrides: {
-                    body: {
-                        // backgroundColor: '#070B34',
-                        backgroundImage: `url(${Image})`,
-                    }
-                }
-            },
-        },
-    });
 
     const toggleMode = () => setMode((m) => (m === 'light' ? 'dark' : 'light'));
 

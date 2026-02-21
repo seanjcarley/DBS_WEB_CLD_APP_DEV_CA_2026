@@ -3,6 +3,7 @@ import { Box, Button, Card, CircularProgress, Container, Grid, IconButton,
     List, ListItem, Typography, TextField, TableFooter, } from "@mui/material";
 import { styled } from '@mui/material/styles'
 import AuthNavBar from "../components/AuthNavBar";
+import AuthSideBar from "../components/AuthSideBar";
 import Validator from 'validator';
 import { Link, useNavigate } from 'react-router-dom'
 import Table from '@mui/material/Table';
@@ -14,6 +15,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { apiFetch } from "../api/client";
 import EditIcon from '@mui/icons-material/Edit';
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 
 
 
@@ -31,19 +33,23 @@ const AccountSummary = () => {
     const [emailAlert, setEmailAlert] = useState('');
     const [emlAlrtClr, setEmlAlrtClr] = useState('');
     
-    // set the customer details variables
-    const [fname, setFname] = useState('');
-    const [tempFname, setTempFname] = useState('');
-    const [nameFieldDisp, setNameFieldDisp] = useState('none');
-    const [surname, setSurname] = useState('');
-    const [tempSname, setTempSname] = useState('');
-    const [snameFieldDisp, setSnameFieldDisp] = useState('none');
-    const [email, setEmail] = useState('');
-    const [tempEmail, setTempEmail] = useState('');
-    const [emailFieldDisp, setEmailFieldDisp] = useState('none');
-    const [phone, setPhone] = useState('');
-    const [tempPhone, setTempPhone] = useState('');
-    const [phoneFieldDisp, setPhoneFieldDisp] = useState('none');
+   // set the customer details variables
+       const [fname, setFname] = useState('');
+       const [tempFname, setTempFname] = useState('');
+       const [nameFieldDisp, setNameFieldDisp] = useState('none');
+       const [nameTypoDisp, setNameTypoDisp] = useState();
+       const [sname, setSname] = useState('');
+       const [tempSname, setTempSname] = useState('');
+       const [snameFieldDisp, setSnameFieldDisp] = useState('none');
+       const [snameTypoDisp, setSnameTypoDisp] = useState('inline-flex');
+       const [email, setEmail] = useState('');
+       const [tempEmail, setTempEmail] = useState('');
+       const [emailFieldDisp, setEmailFieldDisp] = useState('none');
+       const [wmailTypoDisp, setEmailTypoDisp] = useState('inline-flex');
+       const [phone, setPhone] = useState('');
+       const [tempPhone, setTempPhone] = useState('');
+       const [phoneFieldDisp, setPhoneFieldDisp] = useState('none');
+       const [phoneTypoDisp, setPhoneTypoDisp] = useState('inline-flex');
 
     // used to change the styling of table rows
     const StyledTableRow = styled(TableRow)(({theme}) => ({
@@ -53,13 +59,12 @@ const AccountSummary = () => {
         '&:nth-of-type(even)':{
             backgroundColor: theme.palette.secondary.contrastText,
         },
-        // '&:last-child': {
-        //     backgroundColor: '#fff'
-        // }
     }));
     
     // set the loading state to show the spinner if required
     const [loading, setLoading] = useState(true);
+
+    const [open, setOpen] = useState(false);
     
     // set the token and custID variables
     const token = localStorage.getItem('token');
@@ -84,9 +89,10 @@ const AccountSummary = () => {
                     auth: true,
                     body: payload,
                 });
-                setCustDetails(data.results[0]);
+                setCustDetails(data.results[0][0]);
                 setCustVehDetails(data.results[1]);
                 setCustJrnDetails(data.results[2]);
+
             } catch (err) {
                 setError(err.message || 'Failed to retrieve account details...')
             } finally {
@@ -104,7 +110,7 @@ const AccountSummary = () => {
         setDetailsBtnDisplay('none');
         setSaveBtnDisplay('inline-flex');
         setFnameLabel(fname);
-        setSnameLabel(surname);
+        setSnameLabel(sname);
         setEmailLabel(email);
         setPhoneLabel(phone);
     };
@@ -152,6 +158,16 @@ const AccountSummary = () => {
         }
     }
 
+    const enableFnameEdit = () => {
+        setNameFieldDisp();
+        setNameTypoDisp('none');
+    }
+    const updateFname = () => {
+        setNameFieldDisp('none');
+        setNameTypoDisp();
+        console.log(tempFname);
+    }
+
     async function onSubmitPassword(e) {
         e.preventDefault();
         setError('');
@@ -172,7 +188,8 @@ const AccountSummary = () => {
     </Box>
     return (
         <>
-            <AuthNavBar />
+            <AuthNavBar onMenuClick={ () => setOpen(true) } />
+            <AuthSideBar open={open} onClose={() => setOpen(false)} />
             <Typography 
                 variant="h3"
                 align="center"
@@ -192,15 +209,6 @@ const AccountSummary = () => {
                     mx: 'auto'
                 }}
             >
-                {custDetails.map((detail) => (
-                    <Typography 
-                        variant="h5" 
-                        key='greeting_name'
-                        color='secondary'
-                    >
-                        Hello {detail.FIRSTNAME}!
-                    </Typography>
-                ))}
                 <Card
                     sx={{ 
                         width: '100%',
@@ -208,7 +216,17 @@ const AccountSummary = () => {
                         mx: 'auto',
                     }}
                 >
-                    <Typography variant="body 2" sx={{ m: 2}}>
+                        <Typography 
+                            variant="h5" 
+                            key='greeting_name'
+                            color='secondary'
+                            sx={{
+                                mt: 2
+                            }}
+                        >
+                            Hello {custDetails.FIRSTNAME}
+                        </Typography>
+                    <Typography variant="body 2" sx={{ m: 0}}>
                         <p>This page shows an overview of the current status of your 
                         account.</p>
                         <p>You can view more details and update your account 
@@ -220,7 +238,7 @@ const AccountSummary = () => {
                 sx={{
                     width: '90%',
                     gap: 2,
-                    mt: 7,
+                    mt: 4,
                     mx: 'auto',
                     flexGrow: 1,
                 }}
@@ -236,194 +254,132 @@ const AccountSummary = () => {
                                 justifyContent: 'space-between',
                                 flexDirection: 'column',
                                 height: '100%',
+                                alignItems: 'center',
                             }}
                         >
-                            <Box>
-                                {custDetails.map((detail) => (
-                                    <>
-                                        <TableContainer 
-                                            component={Paper}
-                                            sx={{
-                                                width: '96%',
-                                                mt: 1,
-                                            }}
-                                        >
-                                            <Table>
-                                                <TableHead>
-                                                    <TableRow>
-                                                        <TableCell 
-                                                            colSpan={3}
-                                                            align='center'
-                                                            sx={{
-                                                                py: 1
-                                                            }}
-                                                        >
-                                                            <Typography 
-                                                                variant="h6" 
-                                                                sx={{ 
-                                                                    mt: 1,
-                                                                }}
-                                                            >
-                                                                Personal Details
-                                                            </Typography>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                </TableHead>
-                                                <TableBody>
-                                                    <StyledTableRow>
-                                                        <TableCell
-                                                            sx={{
-                                                                py: 1
-                                                            }}
-                                                        >
-                                                            <Typography
-                                                                variant="body2"
-                                                            >
-                                                                Name:
-                                                            </Typography>
-                                                             <TextField 
-                                                                sx={{
-                                                                    display: nameFieldDisp
-                                                                }}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell
-                                                            sx={{
-                                                                py: 1
-                                                            }}
-                                                        >
-                                                            <Typography
-                                                                variant="body1"
-                                                                sx={{
-                                                                    display: 'inline-flex'   
-                                                                }}
-                                                            >
-                                                                {detail.FIRSTNAME}
-                                                            </Typography>
-                                                        </TableCell>
-                                                        <TableCell
-                                                            sx={{
-                                                                py: 1
-                                                            }}
-                                                        >
-                                                            <Button
-                                                                variant='outlined'
-                                                                sx={{
-                                                                    display: 'inline-flex'   
-                                                                }}
-                                                            >
-                                                                <EditIcon />
-                                                            </Button>
-                                                        </TableCell>
-                                                    </StyledTableRow>
-                                                    <StyledTableRow>
-                                                        <TableCell>
-                                                            <Typography
-                                                                variant="body2"
-                                                            >
-                                                                Surname:
-                                                            </Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Typography
-                                                                variant="body1"
-                                                                sx={{
-                                                                    display: 'inline-flex'   
-                                                                }}
-                                                            >
-                                                                {detail.SURNAME}
-                                                            </Typography>
-                                                            <TextField 
-                                                                sx={{
-                                                                    display: snameFieldDisp   
-                                                                }}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Button
-                                                                variant='outlined'
-                                                                sx={{
-                                                                    display: 'inline-flex'   
-                                                                }}
-                                                            >
-                                                                <EditIcon />
-                                                            </Button>
-                                                        </TableCell>
-                                                    </StyledTableRow>
-                                                    <StyledTableRow>
-                                                        <TableCell>
-                                                            <Typography
-                                                                variant="body2"
-                                                            >
-                                                                Email:
-                                                            </Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Typography
-                                                                variant="body1"
-                                                                sx={{
-                                                                    display: 'inline-flex'   
-                                                                }}
-                                                            >
-                                                                {detail.EMAIL}
-                                                            </Typography>
-                                                             <TextField 
-                                                                sx={{
-                                                                    display: emailFieldDisp   
-                                                                }}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Button
-                                                                variant='outlined'
-                                                                sx={{
-                                                                    display: 'inline-flex'   
-                                                                }}
-                                                            >
-                                                                <EditIcon />
-                                                            </Button>
-                                                        </TableCell>
-                                                    </StyledTableRow>
-                                                    <StyledTableRow>
-                                                        <TableCell>
-                                                            <Typography
-                                                                variant="body2"
-                                                            >
-                                                                Phone
-                                                            </Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Typography
-                                                                variant="body1"
-                                                                sx={{
-                                                                    display: 'inline-flex'   
-                                                                }}
-                                                            >
-                                                                {detail.PHONE}
-                                                            </Typography>
-                                                             <TextField 
-                                                                sx={{
-                                                                    display: phoneFieldDisp   
-                                                                }}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Button
-                                                                variant='outlined'
-                                                                sx={{
-                                                                    display: 'inline-flex'   
-                                                                }}
-                                                            >
-                                                                <EditIcon />
-                                                            </Button>
-                                                        </TableCell>
-                                                    </StyledTableRow>
-                                                </TableBody>
-                                            </Table>
-                                        </TableContainer>
-                                    </>
-                                ))}
-                            </Box>
+                            <TableContainer 
+                                component={Paper} 
+                                sx={{ 
+                                    width: '96%', 
+                                    mt: 1, 
+                                    }}
+                                    key='pd_table_container'
+                                >
+                                <Table key='pd_table'>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell colSpan={3} align='center' sx={{ py: 1 }}>
+                                                <Typography variant="h6" sx={{ mt: 1, }}>
+                                                    Personal Details
+                                                </Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        <StyledTableRow key='pd_fname'>
+                                            <TableCell>
+                                                <Typography variant="body2">
+                                                    Name:
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{ display: nameTypoDisp, }}
+                                            >
+                                                <Typography variant="body1">
+                                                    {custDetails.FIRSTNAME}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{ display: nameTypoDisp, }}
+                                            >
+                                                <Button 
+                                                    variant='outlined' 
+                                                    color="secondary" 
+                                                    onClick={enableFnameEdit}
+                                                >
+                                                    <EditIcon />
+                                                </Button>
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{ display: nameFieldDisp, }}
+                                            >
+                                                <TextField 
+                                                    sx={{  }} 
+                                                    value={tempFname}
+                                                    onChange={ e => setTempFname(e.target.value) } 
+                                                    label={fname}
+                                                />
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{ display: nameFieldDisp, }}
+                                            >
+                                                <Button 
+                                                    variant='contained' 
+                                                    color="success"
+                                                    onClick={updateFname}
+                                                >
+                                                    <ThumbUpAltIcon />
+                                                </Button>
+                                            </TableCell>
+                                        </StyledTableRow>
+                                        <StyledTableRow key='pd_sname'>
+                                            <TableCell>
+                                                <Typography variant="body2">
+                                                    Surname:
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body1" sx={{ display: 'inline-flex', }}>
+                                                    {custDetails.SURNAME}
+                                                </Typography>
+                                                <TextField 
+                                                    sx={{ display: snameFieldDisp, }} />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Button variant='outlined' sx={{ display: 'inline-flex', }}>
+                                                    <EditIcon />
+                                                </Button>
+                                            </TableCell>
+                                        </StyledTableRow>
+                                        <StyledTableRow key='pd_email'>
+                                            <TableCell>
+                                                <Typography variant="body2">
+                                                    Email:
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body1" sx={{ display: 'inline-flex', }}>
+                                                    {custDetails.EMAIL}
+                                                </Typography>
+                                                 <TextField sx={{ display: emailFieldDisp, }} />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Button variant='outlined' color="secondary" sx={{ display: 'inline-flex', }}>
+                                                    <EditIcon />
+                                                </Button>
+                                            </TableCell>
+                                        </StyledTableRow>
+                                        <StyledTableRow key='pd_phone'>
+                                            <TableCell>
+                                                <Typography variant="body2">
+                                                    Phone
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body1" sx={{ display: 'inline-flex', }}>
+                                                    {custDetails.PHONE}
+                                                </Typography>
+                                                 <TextField sx={{ display: phoneFieldDisp, }} />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Button variant='outlined' sx={{ display: 'inline-flex', }}>
+                                                    <EditIcon />
+                                                </Button>
+                                            </TableCell>
+                                        </StyledTableRow>
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
                             <Box>
                                 <Button
                                     variant="outlined"
