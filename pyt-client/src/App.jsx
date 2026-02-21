@@ -16,8 +16,8 @@ import ResetPassswordPage from './pages/ResetPasswordPage';
 import PaymentForm from './pages/PaymentForm';
 import PaymentSetup from './pages/PaymentSetup';
 import PaymentComplete from './pages/PaymentComplete';
-import './App.css';
-import './parallax.css';
+// import './App.css';
+// import './parallax.css';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC);
 
