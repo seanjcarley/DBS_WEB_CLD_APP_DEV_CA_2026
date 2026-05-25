@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node main.jsx"
+    "start": "node src/main.jsx"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
